@@ -510,3 +510,211 @@ a:hover {
         font-size: 14px;
     }
 }
+/* ========== AGREGAR AL FINAL DE TU fortinet-theme.css ========== */
+
+/* ========== FIX PARA ELEMENTOS BLANCOS ========== */
+
+/* Elementos con fondo blanco genéricos */
+.bg-white, 
+[style*="background-color: white"], 
+[style*="background-color: #ffffff"], 
+[style*="background-color: #fff"],
+[style*="background: white"],
+[style*="background: #ffffff"],
+[style*="background: #fff"] {
+    background: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+/* Charts y gráficos */
+.chart-container,
+.chart-wrapper,
+.chart,
+canvas,
+svg {
+    background: var(--dark-card) !important;
+    border: 1px solid var(--dark-border) !important;
+    border-radius: 8px !important;
+}
+
+/* Cajas de análisis específicas */
+[class*="analisis"],
+[class*="analysis"],
+[class*="chart"],
+[class*="graph"],
+[class*="metric"] {
+    background: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+    border-radius: 8px !important;
+}
+
+/* Headers con fondo blanco */
+h1, h2, h3, h4, h5, h6 {
+    background: transparent !important;
+    color: var(--text-primary) !important;
+}
+
+/* Botones específicos con fondos claros */
+.btn-light,
+.btn-white,
+[style*="background-color: #f8f9fa"] {
+    background: var(--dark-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.btn-light:hover,
+.btn-white:hover {
+    background: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Tablas con fondo blanco */
+table,
+.table,
+.table-responsive {
+    background: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.table th,
+.table td {
+    border-color: var(--dark-border) !important;
+    color: var(--text-primary) !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background: var(--dark-secondary) !important;
+}
+
+/* Elementos de Bootstrap que pueden ser blancos */
+.bg-light {
+    background: var(--dark-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.text-dark {
+    color: var(--text-primary) !important;
+}
+
+/* Modals y popups */
+.modal-content {
+    background: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--dark-border) !important;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--dark-border) !important;
+}
+
+/* Dropdowns */
+.dropdown-menu {
+    background: var(--dark-card) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.dropdown-item {
+    color: var(--text-primary) !important;
+}
+
+.dropdown-item:hover {
+    background: var(--dark-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Elementos específicos para gráficos */
+.chart-title,
+.chart-legend,
+.chart-labels {
+    color: var(--text-primary) !important;
+    background: transparent !important;
+}
+
+/* Progress bars */
+.progress {
+    background: var(--dark-secondary) !important;
+}
+
+.progress-bar {
+    background: var(--fortinet-red) !important;
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+    background: var(--dark-secondary) !important;
+}
+
+.breadcrumb-item a {
+    color: var(--fortinet-red) !important;
+}
+
+/* Tooltips */
+.tooltip-inner {
+    background: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ========== FIX ESPECÍFICO PARA ELEMENTOS CON ESTILOS INLINE ========== */
+
+/* Override para cualquier elemento con estilo inline blanco */
+[style] {
+    background-color: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Excepción para elementos que SÍ deben mantener colores específicos */
+.score-indicator,
+.badge,
+.btn-primary,
+.btn-outline-primary,
+.alert-success,
+.alert-warning,
+.alert-danger,
+.alert-info {
+    /* Estos mantienen sus estilos originales */
+}
+
+/* ========== FIX PARA TEXTO EN GRÁFICOS ========== */
+text, 
+.recharts-text,
+.recharts-label,
+.chart-text,
+.axis-label {
+    fill: var(--text-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Grid lines en gráficos */
+.recharts-cartesian-grid line {
+    stroke: var(--dark-border) !important;
+}
+
+/* ========== ELEMENTOS CON SOMBRAS BLANCAS ========== */
+.shadow,
+.shadow-sm,
+.shadow-lg {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ========== OVERRIDE GLOBAL MÁS AGRESIVO ========== */
+* {
+    /* Solo si los otros fixes no funcionan */
+}
+
+*[style*="background: white"],
+*[style*="background-color: white"],
+*[style*="background: #fff"],
+*[style*="background-color: #fff"],
+*[style*="background: #ffffff"],
+*[style*="background-color: #ffffff"] {
+    background: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+}
