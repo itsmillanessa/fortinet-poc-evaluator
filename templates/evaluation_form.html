@@ -109,10 +109,11 @@
                             <div class="mb-3">
                                 <label for="responsable_preventa" class="form-label">Responsable de Preventa *</label>
                                 <select class="form-select" id="responsable_preventa" name="responsable_preventa" required>
-                                    <option value="">Seleccione responsable...</option>
-                                    <option value="Josué Temich">Josué Temich</option>
-                                    <option value="Otro SE">Otro SE</option>
-                                </select>
+    				    <option value="">Seleccione responsable...</option>
+    				    {% for responsable in evaluator.responsables_preventa %}
+        				<option value="{{ responsable }}">{{ responsable }}</option>
+    				    {% endfor %}
+				</select>
                                 <div class="invalid-feedback">Por favor seleccione un responsable.</div>
                             </div>
                         </div>

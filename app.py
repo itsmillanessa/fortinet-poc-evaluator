@@ -63,7 +63,21 @@ class FortinetPoCEvaluator:
             'FortiEDR', 'FortiNAC', 'Zero Trust', 'Security Fabric'
         ]
         
-        # Criterios de evaluación según tu esquema
+        # Lista de responsables de preventa
+        self.responsables_preventa = [
+            'Josué Temich',
+            'Alexis Millan',
+            'Luis Mata', 
+            'Lucy Terrazas',
+            'Gabriel Lopez',
+            'Antonio Mendoza',
+            'Edgar Cantu',
+            'Esau Ruiz',
+            'Joel Rodriguez',
+	    'Joel Garza',
+	    'Otro SE...'
+        ]
+	# Criterios de evaluación según tu esquema
         self.evaluation_options = {
             'tiempo_cierre_comercial': {
                 1: '1️⃣ <30 días estimados',
