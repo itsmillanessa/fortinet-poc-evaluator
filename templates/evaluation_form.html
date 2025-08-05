@@ -63,6 +63,26 @@
             </div>
         </div>
     </div>
+<!-- Buscador de Cliente -->
+<div class="container mb-4">
+    <div class="card">
+        <div class="card-header" style="background-color: #6f42c1; color: white;">
+            <h5 class="mb-0">
+                <i class="fas fa-search me-2"></i>Ver Evaluaciones Previas
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/buscar_cliente" class="d-flex">
+                <input type="text" name="cliente_buscar" class="form-control me-2" 
+                       placeholder="Ingrese nombre del cliente para ver evaluaciones anteriores...">
+                <button type="submit" class="btn btn-outline-primary">
+                    <i class="fas fa-search me-1"></i>Buscar
+                </button>
+            </form>
+            <small class="text-muted">Ejemplo: "Iconn", "Innovasport", etc.</small>
+        </div>
+    </div>
+</div>
 
 <script>
 // Prellenar cliente si viene de búsqueda
@@ -72,6 +92,7 @@ if (cliente) {
     document.getElementById('cliente').value = cliente;
 }
 </script>
+
     <div class="container">
         <!-- Mensajes Flash -->
         {% with messages = get_flashed_messages(with_categories=true) %}
