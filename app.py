@@ -552,8 +552,7 @@ def api_evaluate():
 
 if __name__ == '__main__':
     import os
+    # Detectar si estamos en Railway
     port = int(os.environ.get('PORT', 5000))
-    app.run(debug=False, host='0.0.0.0', port=port)
-else:
-    # Para Railway/Gunicorn
-    import os
+    print(f"🚀 Starting Fortinet PoC Evaluator on port {port}")
+    app.run(debug=False, host='0.0.0.0', port=port, threaded=True)
