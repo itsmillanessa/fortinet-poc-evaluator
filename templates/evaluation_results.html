@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados Evaluación PoC - {{ form_data.cliente }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .fortinet-primary { background-color: #EE3124; }
+        .header-gradient { 
+            background: linear-gradient(135deg, #EE3124 0%, #c41e3a 100%);
+            color: white;
+        }
+        .score-card {
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .score-card:hover { transform: translateY(-5px); }
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0 auto;
+            position: relative;
+        }
+        .eficiencia-alta { background: linear-gradient(135deg, #28a745, #20c997); color: white; }
+        .eficiencia-media { background: linear-gradient(135deg, #ffc107, #fd7e14); color: #000; }
+        .eficiencia-baja { background: linear-gradient(135deg, #6f42c1, #e83e8c); color: white; }
+        .riesgo-bajo { background: linear-gradient(135deg, #28a745, #20c997); color: white; }
+        .riesgo-medio { background: linear-gradient(135deg, #ffc107, #fd7e14); color: #000; }
+        .riesgo-alto { background: linear-gradient(135deg, #dc3545, #e83e8c); color: white; }
+        .semaforo-verde { 
+            background: linear-gradient(135deg, #28a745, #20c997); 
+            color: white;
+            border: 3px solid #155724;
+        }
+        .semaforo-amarillo { 
+            background: linear-gradient(135deg, #ffc107, #fd7e14); 
+            color: #000;
+            border: 3px solid #856404;
+        }
+        .semaforo-naranja { 
+            background: linear-gradient(135deg, #fd7e14, #dc3545); 
+            color: white;
+            border: 3px solid #721c24;
+        }
+        .semaforo-rojo { 
+            background: linear-gradient(135deg, #dc3545, #6f42c1); 
+            color: white;
+            border: 3px solid #721c24;
+        }
+        .recommendation-card {
+            border-left: 5px solid #EE3124;
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        }
+        .criteria-detail {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .criteria-1 { background-color: #d4edda; border-color: #c3e6cb; }
+        .criteria-2 { background-color: #fff3cd; border-color: #ffeaa7; }
+        .criteria-3 { background-color: #f8d7da; border-color: #f5c6cb; }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(238, 49, 36, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(238, 49, 36, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(238, 49, 36, 0); }
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="header-gradient py-4 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-0"><i class="fas fa-chart-pie me-3"></i>Resultados de Evaluación PoC</h1>
+                    <p class="mb-0 opacity-75">{{ form_data.cliente }} - {{ form_data.proyecto }}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="/" class="btn btn-light">
+                        <i class="fas fa-plus me-2"></i>Nueva Evaluación
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Resumen Ejecutivo -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card score-card {% if 'Ideal' in scores.semaforo %}semaforo-verde{% elif 'Bueno' in scores.semaforo or 'Aceptable' in scores.semaforo %}semaforo-amarillo{% elif 'Cuidado' in scores.semaforo or 'Alto riesgo' in scores.semaforo %}semaforo-naranja{% else %}semaforo-rojo{% endif %} pulse">
+                    <div class="card-body text-center py-4">
+                        <h2 class="mb-3">
+                            {% if 'Crítico' in scores.semaforo %}
+                                🔴 RESULTADO: NO RECOMENDADO
+                            {% elif 'Alto riesgo' in scores.semaforo %}
+                                🟠 RESULTADO: PROCEDER CON CAUTELA
+                            {% elif 'Cuidado' in scores.semaforo %}
+                                🟡 RESULTADO: REVISAR CONDICIONES
+                            {% elif 'Ideal' in scores.semaforo %}
+                                🟢 RESULTADO: ALTAMENTE RECOMENDADO
+                            {% else %}
+                                🟡 RESULTADO: CONDICIONES ACEPTABLES
+                            {% endif %}
+                        </h2>
+                        <p class="lead mb-0">{{ scores.semaforo }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Métricas Principales -->
+        <div class="row mb-4">
+            <!-- Eficiencia -->
+            <div class="col-md-4">
+                <div class="card score-card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">
+                            <i class="fas fa-tachometer-alt me-2"></i>Eficiencia
+                        </h5>
+                        <div class="score-circle {% if 'Alta' in scores.nivel_eficiencia %}eficiencia-alta{% elif 'Media' in scores.nivel_eficiencia %}eficiencia-media{% else %}eficiencia-baja{% endif %}">
+                            {{ scores.eficiencia_total }}/24
+                        </div>
+                        <h4 class="mt-3 mb-0">{{ scores.nivel_eficiencia }}</h4>
+                        <small class="text-muted">Menor puntaje = Mayor eficiencia</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Riesgo -->
+            <div class="col-md-4">
+                <div class="card score-card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Riesgo
+                        </h5>
+                        <div class="score-circle {% if 'Bajo' in scores.nivel_riesgo %}riesgo-bajo{% elif 'Medio' in scores.nivel_riesgo %}riesgo-medio{% else %}riesgo-alto{% endif %}">
+                            {{ scores.riesgo_total }}/21
+                        </div>
+                        <h4 class="mt-3 mb-0">{{ scores.nivel_riesgo }}</h4>
+                        <small class="text-muted">Mayor puntaje = Mayor riesgo</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información del Cliente -->
+            <div class="col-md-4">
+                <div class="card score-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-info-circle me-2"></i>Detalles
+                        </h5>
+                        <p><strong>Cliente:</strong> {{ form_data.cliente }}</p>
+                        <p><strong>Proyecto:</strong> {{ form_data.proyecto }}</p>
+                        <p><strong>Responsable:</strong> {{ form_data.responsable_preventa }}</p>
+                        <p><strong>Evaluado:</strong> {{ current_date }}</p>
+                        <p class="mb-0"><strong>Estado:</strong> <span class="badge bg-primary">Planeación</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recomendaciones -->
+        {% if recommendations %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card recommendation-card">
+                    <div class="card-header" style="background-color: #EE3124; color: white;">
+                        <h5 class="mb-0">
+                            <i class="fas fa-lightbulb me-2"></i>Recomendaciones Específicas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for recommendation in recommendations %}
+                            <div class="col-md-6 mb-2">
+                                <div class="alert alert-{% if 'CRÍTICO' in recommendation or 'NO RECOMENDADO' in recommendation %}danger{% elif 'RECOMENDADA' in recommendation %}success{% else %}warning{% endif %} mb-2">
+                                    <i class="fas fa-{% if 'CRÍTICO' in recommendation %}exclamation-circle{% elif 'RECOMENDADA' in recommendation %}check-circle{% else %}info-circle{% endif %} me-2"></i>
+                                    {{ recommendation }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Desglose Detallado -->
+        <div class="row">
+            <!-- Criterios de Eficiencia -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header" style="background-color: #28a745; color: white;">
+                        <h5 class="mb-0">
+                            <i class="fas fa-tachometer-alt me-2"></i>Desglose de Eficiencia
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="criteria-detail criteria-{{ criteria.tiempo_cierre_comercial }}">
+                            <strong>Tiempo para cierre:</strong> 
+                            {{ evaluator.evaluation_options['tiempo_cierre_comercial'][criteria.tiempo_cierre_comercial] }}
+                        </div>
+                        <div class="criteria-detail criteria-{{ criteria.recursos_preventa }}">
+                            <strong>Recursos preventa:</strong>
+                            {{ evaluator.evaluation_options['recursos_preventa'][criteria.recursos_preventa] }}
+                        </div>
+                        <div class="criteria-detail criteria-{{ criteria.monto_proyecto }}">
+                            <strong>Monto del proyecto:</strong>
+                            {{ evaluator.evaluation_options['monto_proyecto'][criteria.monto_proyecto] }}
+                        </div>
+                        <div class="criteria-detail criteria-{{ criteria.potencial_comercial }}">
+                            <strong>Potencial comercial:</strong>
+                            {{ evaluator.evaluation_options['potencial_comercial'][criteria.potencial_comercial] }}
+                        </div>
+                        <div class="criteria-detail criteria-{{ criteria.poc_definida }}">
+                            <strong>PoC bien definida:</strong>
+                            {{ evaluator.evaluation_options['poc_definida'][criteria.poc_definida] }}
+                        </div>
+                        <div class="criteria-detail criteria-{{ criteria.plazo_ejecucion }}">
+                            <strong>Plazo de ejecución:</strong>
+                            {{ evaluator.evaluation_options['plazo_ejecucion'][criteria.plazo_ejecucion] }}
+                        </div>
+                        <div class="criteria-detail criteria-{{ criteria.entorno_pruebas }}">
+                            <strong>Entorno de pruebas:</strong>
+                            {{ evaluator.evaluation_options['entorno_pruebas'][criteria.entorno_pruebas] }}
+                        </div>
+                        <div class="criteria-detail criteria-{{ criteria.presupuesto_definido }}">
+                            <strong>Presupuesto definido:</strong>
+                            {{ evaluator.evaluation_options['presupuesto_definido'][criteria.presupuesto_definido] }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Criterios de Riesgo -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header" style="background-color: #dc3545; color: white;">
+                        <h5 class="mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Desglose de Riesgo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="criteria-detail criteria-{{ criteria.historial_cliente }}">
+                            <strong>Historial con cliente:</strong>
+                            {{ evaluator.evaluation_options['historial_cliente'][criteria.historial_cliente] }}

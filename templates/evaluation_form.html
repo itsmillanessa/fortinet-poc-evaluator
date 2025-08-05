@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación PoC Fortinet - Sistema de Riesgo y Eficiencia</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .fortinet-primary { background-color: #EE3124; }
+        .fortinet-secondary { background-color: #2C3E50; }
+        .card-hover:hover { transform: translateY(-3px); transition: all 0.3s ease; }
+        .header-gradient { 
+            background: linear-gradient(135deg, #EE3124 0%, #c41e3a 100%);
+            color: white;
+        }
+        .criteria-card { 
+            border-left: 4px solid #EE3124; 
+            margin-bottom: 20px;
+        }
+        .score-indicator {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .score-1 { background-color: #28a745; color: white; }
+        .score-2 { background-color: #ffc107; color: #000; }
+        .score-3 { background-color: #dc3545; color: white; }
+        .form-section { margin-bottom: 30px; }
+        .radio-option { 
+            margin: 10px 0; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .radio-option:hover { background-color: #f8f9fa; }
+        .radio-option input[type="radio"]:checked + label { font-weight: bold; }
+        .help-text { font-size: 0.9em; color: #666; margin-top: 5px; }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="header-gradient py-4 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-0"><i class="fas fa-chart-line me-3"></i>Sistema de Evaluación PoC Fortinet</h1>
+                    <p class="mb-0 opacity-75">Análisis de Riesgo y Eficiencia para Pruebas de Concepto</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <span class="me-3">
+                            <i class="fas fa-traffic-light me-2"></i>
+                            <small>Sistema de Semáforo Integrado</small>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Mensajes Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'warning' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/evaluate" class="needs-validation" novalidate>
+            
+            <!-- Información General -->
+            <div class="card mb-4 card-hover">
+                <div class="card-header fortinet-secondary text-white">
+                    <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>Información General del PoC</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="cliente" class="form-label">Cliente *</label>
+                                <input type="text" class="form-control" id="cliente" name="cliente" required>
+                                <div class="invalid-feedback">Por favor ingrese el nombre del cliente.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="proyecto" class="form-label">Proyecto/Tecnología Fortinet *</label>
+                                <select class="form-select" id="proyecto" name="proyecto" required>
+                                    <option value="">Seleccione el proyecto...</option>
+                                    {% for proyecto in evaluator.proyectos_fortinet %}
+                                        <option value="{{ proyecto }}">{{ proyecto }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Por favor seleccione un proyecto.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="responsable_preventa" class="form-label">Responsable de Preventa *</label>
+                                <select class="form-select" id="responsable_preventa" name="responsable_preventa" required>
+                                    <option value="">Seleccione responsable...</option>
+                                    <option value="Josué Temich">Josué Temich</option>
+                                    <option value="Otro SE">Otro SE</option>
+                                </select>
+                                <div class="invalid-feedback">Por favor seleccione un responsable.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="descripcion" class="form-label">Descripción del PoC</label>
+                                <textarea class="form-control" id="descripcion" name="descripcion" rows="3" placeholder="Descripción breve del alcance y objetivos..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Criterios de Eficiencia -->
+            <div class="card mb-4 card-hover criteria-card">
+                <div class="card-header" style="background-color: #28a745; color: white;">
+                    <h4 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i>Criterios de Eficiencia</h4>
+                    <small>Evalúe los factores que impactan la eficiencia del PoC</small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Tiempo para cierre comercial -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-clock me-2"></i>Tiempo para cierre comercial</h6>
+                            <div class="help-text">¿Cuánto tiempo estiman para tomar la decisión de compra?</div>
+                            {% for value, text in evaluator.evaluation_options['tiempo_cierre_comercial'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="tiempo_cierre_comercial" id="tiempo_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="tiempo_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Recursos preventa requeridos -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-users-cog me-2"></i>Recursos preventa requeridos</h6>
+                            <div class="help-text">¿Cuánto esfuerzo de preventa se requiere?</div>
+                            {% for value, text in evaluator.evaluation_options['recursos_preventa'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="recursos_preventa" id="recursos_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="recursos_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Monto del proyecto -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-dollar-sign me-2"></i>Monto del proyecto</h6>
+                            <div class="help-text">¿Cuál es el valor comercial esperado?</div>
+                            {% for value, text in evaluator.evaluation_options['monto_proyecto'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="monto_proyecto" id="monto_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="monto_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Potencial comercial -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-chart-line me-2"></i>Potencial comercial</h6>
+                            <div class="help-text">¿Qué tan real es la oportunidad de negocio?</div>
+                            {% for value, text in evaluator.evaluation_options['potencial_comercial'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="potencial_comercial" id="potencial_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="potencial_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- PoC bien definida -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-clipboard-list me-2"></i>PoC bien definida</h6>
+                            <div class="help-text">¿Qué tan claros son los criterios de éxito?</div>
+                            {% for value, text in evaluator.evaluation_options['poc_definida'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="poc_definida" id="definida_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="definida_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Plazo de ejecución -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-calendar-alt me-2"></i>Plazo de ejecución</h6>
+                            <div class="help-text">¿Es factible el timeline propuesto?</div>
+                            {% for value, text in evaluator.evaluation_options['plazo_ejecucion'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="plazo_ejecucion" id="plazo_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="plazo_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Entorno de pruebas -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-flask me-2"></i>Entorno de pruebas</h6>
+                            <div class="help-text">¿Dónde se realizará la PoC?</div>
+                            {% for value, text in evaluator.evaluation_options['entorno_pruebas'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="entorno_pruebas" id="entorno_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="entorno_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Presupuesto definido -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-money-check-alt me-2"></i>Presupuesto definido</h6>
+                            <div class="help-text">¿Existe presupuesto aprobado?</div>
+                            {% for value, text in evaluator.evaluation_options['presupuesto_definido'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="presupuesto_definido" id="presupuesto_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="presupuesto_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Criterios de Riesgo -->
+            <div class="card mb-4 card-hover criteria-card">
+                <div class="card-header" style="background-color: #dc3545; color: white;">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Criterios de Riesgo</h4>
+                    <small>Evalúe los factores que representan riesgo para el PoC</small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Historial con el cliente -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-history me-2"></i>Historial con el cliente</h6>
+                            <div class="help-text">¿Qué relación comercial existe con el cliente?</div>
+                            {% for value, text in evaluator.evaluation_options['historial_cliente'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="historial_cliente" id="historial_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="historial_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Competencia directa -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-chess me-2"></i>Competencia directa</h6>
+                            <div class="help-text">¿Cuál es nuestra posición competitiva?</div>
+                            {% for value, text in evaluator.evaluation_options['competencia_directa'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="competencia_directa" id="competencia_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="competencia_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Madurez del cliente -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-graduation-cap me-2"></i>Madurez del cliente</h6>
+                            <div class="help-text">¿Qué experiencia tiene el cliente con la tecnología?</div>
+                            {% for value, text in evaluator.evaluation_options['madurez_cliente'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="madurez_cliente" id="madurez_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="madurez_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Naturaleza del PoC -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-search me-2"></i>Naturaleza del PoC</h6>
+                            <div class="help-text">¿Cuál es el propósito real del PoC?</div>
+                            {% for value, text in evaluator.evaluation_options['naturaleza_poc'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="naturaleza_poc" id="naturaleza_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="naturaleza_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Sponsor ejecutivo -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-user-tie me-2"></i>Sponsor ejecutivo</h6>
+                            <div class="help-text">¿Existe un patrocinador ejecutivo del proyecto?</div>
+                            {% for value, text in evaluator.evaluation_options['sponsor_ejecutivo'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="sponsor_ejecutivo" id="sponsor_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="sponsor_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Compromiso del cliente -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-handshake me-2"></i>Compromiso del cliente</h6>
+                            <div class="help-text">¿Qué recursos dedicará el cliente?</div>
+                            {% for value, text in evaluator.evaluation_options['compromiso_cliente'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="compromiso_cliente" id="compromiso_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="compromiso_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Complejidad técnica -->
+                        <div class="col-md-6 form-section">
+                            <h6><i class="fas fa-cogs me-2"></i>Complejidad técnica</h6>
+                            <div class="help-text">¿Qué tan compleja es la implementación?</div>
+                            {% for value, text in evaluator.evaluation_options['complejidad_tecnica'].items() %}
+                            <div class="radio-option">
+                                <input type="radio" name="complejidad_tecnica" id="complejidad_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <label for="complejidad_{{ value }}" class="form-label">
+                                    <span class="score-indicator score-{{ value }}">{{ value }}</span>
+                                    {{ text }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="card mb-5">
+                <div class="card-body text-center">
+                    <button type="submit" class="btn btn-lg me-3" style="background-color: #EE3124; color: white;">
+                        <i class="fas fa-calculator me-2"></i>Evaluar PoC
+                    </button>
+                    <button type="reset" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-undo me-2"></i>Limpiar Formulario
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Validación del formulario
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Efecto hover en opciones radio
+document.querySelectorAll('.radio-option').forEach(function(option) {
+    option.addEventListener('click', function() {
+        const radio = this.querySelector('input[type="radio"]');
+        if (radio) {
+            radio.checked = true;
+        }
+    });
+});
+</script>
+
+</body>
+</html>
