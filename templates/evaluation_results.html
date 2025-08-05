@@ -3,93 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados Evaluación PoC - {{ form_data.cliente }}</title>
+    <title>Análisis Ejecutivo PoC - {{ form_data.cliente }}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .fortinet-primary { background-color: #EE3124; }
-        .header-gradient { 
-            background: linear-gradient(135deg, #EE3124 0%, #c41e3a 100%);
-            color: white;
-        }
-        .score-card {
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-        }
-        .score-card:hover { transform: translateY(-5px); }
-        .score-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: bold;
-            margin: 0 auto;
-            position: relative;
-        }
-        .eficiencia-alta { background: linear-gradient(135deg, #28a745, #20c997); color: white; }
-        .eficiencia-media { background: linear-gradient(135deg, #ffc107, #fd7e14); color: #000; }
-        .eficiencia-baja { background: linear-gradient(135deg, #6f42c1, #e83e8c); color: white; }
-        .riesgo-bajo { background: linear-gradient(135deg, #28a745, #20c997); color: white; }
-        .riesgo-medio { background: linear-gradient(135deg, #ffc107, #fd7e14); color: #000; }
-        .riesgo-alto { background: linear-gradient(135deg, #dc3545, #e83e8c); color: white; }
-        .semaforo-verde { 
-            background: linear-gradient(135deg, #28a745, #20c997); 
-            color: white;
-            border: 3px solid #155724;
-        }
-        .semaforo-amarillo { 
-            background: linear-gradient(135deg, #ffc107, #fd7e14); 
-            color: #000;
-            border: 3px solid #856404;
-        }
-        .semaforo-naranja { 
-            background: linear-gradient(135deg, #fd7e14, #dc3545); 
-            color: white;
-            border: 3px solid #721c24;
-        }
-        .semaforo-rojo { 
-            background: linear-gradient(135deg, #dc3545, #6f42c1); 
-            color: white;
-            border: 3px solid #721c24;
-        }
-        .recommendation-card {
-            border-left: 5px solid #EE3124;
-            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-        }
-        .criteria-detail {
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-        .criteria-1 { background-color: #d4edda; border-color: #c3e6cb; }
-        .criteria-2 { background-color: #fff3cd; border-color: #ffeaa7; }
-        .criteria-3 { background-color: #f8d7da; border-color: #f5c6cb; }
-        .pulse { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(238, 49, 36, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(238, 49, 36, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(238, 49, 36, 0); }
-        }
-    </style>
+    <link href="/static/css/fortinet-theme.css" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="https://www.fortinet.com/content/dam/fortinet/images/general/fortinet-favicon.svg">
+    <meta name="description" content="Análisis ejecutivo de evaluación PoC Fortinet">
 </head>
 <body class="bg-light">
 
 <div class="container-fluid">
-    <!-- Header -->
+    <!-- Professional Header -->
     <div class="header-gradient py-4 mb-4">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1 class="mb-0"><i class="fas fa-chart-pie me-3"></i>Resultados de Evaluación PoC</h1>
-                    <p class="mb-0 opacity-75">{{ form_data.cliente }} - {{ form_data.proyecto }}</p>
+                    <div class="d-flex align-items-center">
+                        <img src="https://www.fortinet.com/content/dam/fortinet/images/general/fortinet-logo.svg" 
+                             alt="Fortinet" class="fortinet-logo me-3">
+                        <div>
+                            <h1 class="mb-0">Análisis Ejecutivo PoC</h1>
+                            <p class="mb-0 opacity-75">{{ form_data.cliente }} - {{ form_data.proyecto }}</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="/" class="btn btn-light">
+                    <a href="/" class="btn btn-light btn-professional">
                         <i class="fas fa-plus me-2"></i>Nueva Evaluación
                     </a>
                 </div>
@@ -98,178 +37,420 @@
     </div>
 
     <div class="container">
-        <!-- Resumen Ejecutivo -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card score-card {% if 'Ideal' in scores.semaforo %}semaforo-verde{% elif 'Bueno' in scores.semaforo or 'Aceptable' in scores.semaforo %}semaforo-amarillo{% elif 'Cuidado' in scores.semaforo or 'Alto riesgo' in scores.semaforo %}semaforo-naranja{% else %}semaforo-rojo{% endif %} pulse">
-                    <div class="card-body text-center py-4">
-                        <h2 class="mb-3">
-                            {% if 'Crítico' in scores.semaforo %}
-                                🔴 RESULTADO: NO RECOMENDADO
-                            {% elif 'Alto riesgo' in scores.semaforo %}
-                                🟠 RESULTADO: PROCEDER CON CAUTELA
-                            {% elif 'Cuidado' in scores.semaforo %}
-                                🟡 RESULTADO: REVISAR CONDICIONES
-                            {% elif 'Ideal' in scores.semaforo %}
-                                🟢 RESULTADO: ALTAMENTE RECOMENDADO
-                            {% else %}
-                                🟡 RESULTADO: CONDICIONES ACEPTABLES
-                            {% endif %}
-                        </h2>
-                        <p class="lead mb-0">{{ scores.semaforo }}</p>
-                    </div>
-                </div>
+        <!-- Executive Summary -->
+        <div class="card executive-summary pulse mb-4">
+            <div class="card-body text-center py-5">
+                {% if 'Crítico' in scores.semaforo %}
+                    <h2><i class="fas fa-times-circle me-3"></i>RECOMENDACIÓN: NO PROCEDER</h2>
+                {% elif 'Alto riesgo' in scores.semaforo %}
+                    <h2><i class="fas fa-exclamation-triangle me-3"></i>PROCEDER CON MÁXIMA CAUTELA</h2>
+                {% elif 'Ideal' in scores.semaforo %}
+                    <h2><i class="fas fa-check-circle me-3"></i>ALTAMENTE RECOMENDADO</h2>
+                {% else %}
+                    <h2><i class="fas fa-info-circle me-3"></i>REVISAR CONDICIONES</h2>
+                {% endif %}
+                <p class="lead mb-0">{{ scores.semaforo }}</p>
             </div>
         </div>
 
-        <!-- Métricas Principales -->
-        <div class="row mb-4">
-            <!-- Eficiencia -->
-            <div class="col-md-4">
-                <div class="card score-card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">
-                            <i class="fas fa-tachometer-alt me-2"></i>Eficiencia
-                        </h5>
-                        <div class="score-circle {% if 'Alta' in scores.nivel_eficiencia %}eficiencia-alta{% elif 'Media' in scores.nivel_eficiencia %}eficiencia-media{% else %}eficiencia-baja{% endif %}">
-                            {{ scores.eficiencia_total }}/24
-                        </div>
-                        <h4 class="mt-3 mb-0">{{ scores.nivel_eficiencia }}</h4>
-                        <small class="text-muted">Menor puntaje = Mayor eficiencia</small>
-                    </div>
+        <!-- Professional Metrics Dashboard -->
+        <div class="metrics-dashboard">
+            <!-- Eficiencia Metric -->
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-tachometer-alt"></i>
                 </div>
+                <div class="score-circle-enhanced {% if 'Alta' in scores.nivel_eficiencia %}eficiencia-alta{% elif 'Media' in scores.nivel_eficiencia %}eficiencia-media{% else %}eficiencia-baja{% endif %}">
+                    {{ scores.eficiencia_total }}/24
+                </div>
+                <h4>{{ scores.nivel_eficiencia }}</h4>
+                <p class="text-muted">Eficiencia Operacional</p>
+                <small>Menor puntaje = Mayor eficiencia</small>
             </div>
 
-            <!-- Riesgo -->
-            <div class="col-md-4">
-                <div class="card score-card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">
-                            <i class="fas fa-exclamation-triangle me-2"></i>Riesgo
-                        </h5>
-                        <div class="score-circle {% if 'Bajo' in scores.nivel_riesgo %}riesgo-bajo{% elif 'Medio' in scores.nivel_riesgo %}riesgo-medio{% else %}riesgo-alto{% endif %}">
-                            {{ scores.riesgo_total }}/21
-                        </div>
-                        <h4 class="mt-3 mb-0">{{ scores.nivel_riesgo }}</h4>
-                        <small class="text-muted">Mayor puntaje = Mayor riesgo</small>
-                    </div>
+            <!-- Riesgo Metric -->
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-shield-alt"></i>
                 </div>
+                <div class="score-circle-enhanced {% if 'Bajo' in scores.nivel_riesgo %}riesgo-bajo{% elif 'Medio' in scores.nivel_riesgo %}riesgo-medio{% else %}riesgo-alto{% endif %}">
+                    {{ scores.riesgo_total }}/21
+                </div>
+                <h4>{{ scores.nivel_riesgo }}</h4>
+                <p class="text-muted">Nivel de Riesgo</p>
+                <small>Mayor puntaje = Mayor riesgo</small>
             </div>
 
-            <!-- Información del Cliente -->
-            <div class="col-md-4">
-                <div class="card score-card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <i class="fas fa-info-circle me-2"></i>Detalles
-                        </h5>
-                        <p><strong>Cliente:</strong> {{ form_data.cliente }}</p>
-                        <p><strong>Proyecto:</strong> {{ form_data.proyecto }}</p>
-                        <p><strong>Responsable:</strong> {{ form_data.responsable_preventa }}</p>
-                        <p><strong>Evaluado:</strong> {{ current_date }}</p>
-                        <p class="mb-0"><strong>Estado:</strong> <span class="badge bg-primary">Planeación</span></p>
-                    </div>
+            <!-- Client Info -->
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-building"></i>
                 </div>
+                <h4>{{ form_data.cliente }}</h4>
+                <p><strong>Proyecto:</strong> {{ form_data.proyecto }}</p>
+                <p><strong>Responsable:</strong> {{ form_data.responsable_preventa }}</p>
+                <p><strong>Evaluado:</strong> {{ current_date }}</p>
+                <span class="badge bg-primary">En Planeación</span>
             </div>
         </div>
 
-        <!-- Recomendaciones -->
+        <!-- Professional Recommendations -->
         {% if recommendations %}
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card recommendation-card">
-                    <div class="card-header" style="background-color: #EE3124; color: white;">
-                        <h5 class="mb-0">
-                            <i class="fas fa-lightbulb me-2"></i>Recomendaciones Específicas
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            {% for recommendation in recommendations %}
-                            <div class="col-md-6 mb-2">
-                                <div class="alert alert-{% if 'CRÍTICO' in recommendation or 'NO RECOMENDADO' in recommendation %}danger{% elif 'RECOMENDADA' in recommendation %}success{% else %}warning{% endif %} mb-2">
-                                    <i class="fas fa-{% if 'CRÍTICO' in recommendation %}exclamation-circle{% elif 'RECOMENDADA' in recommendation %}check-circle{% else %}info-circle{% endif %} me-2"></i>
-                                    {{ recommendation }}
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
+        <div class="recommendations-professional">
+            <h5 class="mb-4 mt-3">
+                <i class="fas fa-lightbulb me-2"></i>Recomendaciones Estratégicas
+            </h5>
+            <div class="row">
+                {% for recommendation in recommendations %}
+                <div class="col-lg-6 mb-2">
+                    <div class="recommendation-item alert-{% if 'CRÍTICO' in recommendation or 'NO RECOMENDADO' in recommendation %}danger{% elif 'RECOMENDADA' in recommendation %}success{% else %}warning{% endif %}">
+                        <i class="fas fa-{% if 'CRÍTICO' in recommendation %}exclamation-circle{% elif 'RECOMENDADA' in recommendation %}check-circle{% else %}info-circle{% endif %} me-2"></i>
+                        {{ recommendation }}
                     </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        <!-- Desglose Detallado -->
-        <div class="row">
-            <!-- Criterios de Eficiencia -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header" style="background-color: #28a745; color: white;">
-                        <h5 class="mb-0">
-                            <i class="fas fa-tachometer-alt me-2"></i>Desglose de Eficiencia
-                        </h5>
+        <!-- Professional Breakdown -->
+        <div class="breakdown-section">
+            <!-- Eficiencia Breakdown -->
+            <div class="breakdown-card">
+                <div class="breakdown-header eficiencia">
+                    <i class="fas fa-tachometer-alt me-2"></i>Análisis de Eficiencia
+                </div>
+                <div class="breakdown-body">
+                    <div class="criteria-item-professional criteria-{{ criteria.tiempo_cierre_comercial }}">
+                        <span><strong>Tiempo para cierre:</strong></span>
+                        <span>{{ evaluator.evaluation_options['tiempo_cierre_comercial'][criteria.tiempo_cierre_comercial] }}</span>
                     </div>
-                    <div class="card-body">
-                        <div class="criteria-detail criteria-{{ criteria.tiempo_cierre_comercial }}">
-                            <strong>Tiempo para cierre:</strong> 
-                            {{ evaluator.evaluation_options['tiempo_cierre_comercial'][criteria.tiempo_cierre_comercial] }}
-                        </div>
-                        <div class="criteria-detail criteria-{{ criteria.recursos_preventa }}">
-                            <strong>Recursos preventa:</strong>
-                            {{ evaluator.evaluation_options['recursos_preventa'][criteria.recursos_preventa] }}
-                        </div>
-                        <div class="criteria-detail criteria-{{ criteria.monto_proyecto }}">
-                            <strong>Monto del proyecto:</strong>
-                            {{ evaluator.evaluation_options['monto_proyecto'][criteria.monto_proyecto] }}
-                        </div>
-                        <div class="criteria-detail criteria-{{ criteria.potencial_comercial }}">
-                            <strong>Potencial comercial:</strong>
-                            {{ evaluator.evaluation_options['potencial_comercial'][criteria.potencial_comercial] }}
-                        </div>
-                        <div class="criteria-detail criteria-{{ criteria.poc_definida }}">
-                            <strong>PoC bien definida:</strong>
-                            {{ evaluator.evaluation_options['poc_definida'][criteria.poc_definida] }}
-                        </div>
-                        <div class="criteria-detail criteria-{{ criteria.plazo_ejecucion }}">
-                            <strong>Plazo de ejecución:</strong>
-                            {{ evaluator.evaluation_options['plazo_ejecucion'][criteria.plazo_ejecucion] }}
-                        </div>
-                        <div class="criteria-detail criteria-{{ criteria.entorno_pruebas }}">
-                            <strong>Entorno de pruebas:</strong>
-                            {{ evaluator.evaluation_options['entorno_pruebas'][criteria.entorno_pruebas] }}
-                        </div>
-                        <div class="criteria-detail criteria-{{ criteria.presupuesto_definido }}">
-                            <strong>Presupuesto definido:</strong>
-                            {{ evaluator.evaluation_options['presupuesto_definido'][criteria.presupuesto_definido] }}
-                        </div>
+                    <div class="criteria-item-professional criteria-{{ criteria.recursos_preventa }}">
+                        <span><strong>Recursos preventa:</strong></span>
+                        <span>{{ evaluator.evaluation_options['recursos_preventa'][criteria.recursos_preventa] }}</span>
+                    </div>
+                    <div class="criteria-item-professional criteria-{{ criteria.monto_proyecto }}">
+                        <span><strong>Monto del proyecto:</strong></span>
+                        <span>{{ evaluator.evaluation_options['monto_proyecto'][criteria.monto_proyecto] }}</span>
+                    </div>
+                    <div class="criteria-item-professional criteria-{{ criteria.potencial_comercial }}">
+                        <span><strong>Potencial comercial:</strong></span>
+                        <span>{{ evaluator.evaluation_options['potencial_comercial'][criteria.potencial_comercial] }}</span>
+                    </div>
+                    <div class="criteria-item-professional criteria-{{ criteria.poc_definida }}">
+                        <span><strong>PoC bien definida:</strong></span>
+                        <span>{{ evaluator.evaluation_options['poc_definida'][criteria.poc_definida] }}</span>
+                    </div>
+                    <div class="criteria-item-professional criteria-{{ criteria.plazo_ejecucion }}">
+                        <span><strong>Plazo de ejecución:</strong></span>
+                        <span>{{ evaluator.evaluation_options['plazo_ejecucion'][criteria.plazo_ejecucion] }}</span>
+                    </div>
+                    <div class="criteria-item-professional criteria-{{ criteria.entorno_pruebas }}">
+                        <span><strong>Entorno de pruebas:</strong></span>
+                        <span>{{ evaluator.evaluation_options['entorno_pruebas'][criteria.entorno_pruebas] }}</span>
+                    </div>
+                    <div class="criteria-item-professional criteria-{{ criteria.presupuesto_definido }}">
+                        <span><strong>Presupuesto definido:</strong></span>
+                        <span>{{ evaluator.evaluation_options['presupuesto_definido'][criteria.presupuesto_definido] }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Criterios de Riesgo -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header" style="background-color: #dc3545; color: white;">
-                        <h5 class="mb-0">
-                            <i class="fas fa-exclamation-triangle me-2"></i>Desglose de Riesgo
-                        </h5>
+            <!-- Riesgo Breakdown -->
+            <div class="breakdown-card">
+                <div class="breakdown-header riesgo">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Análisis de Riesgo
+                </div>
+                <div class="breakdown-body">
+                    <div class="criteria-item-professional criteria-{{ criteria.historial_cliente }}">
+                        <span><strong>Historial con cliente:</strong></span>
+                        <span>{{ evaluator.evaluation_options['historial_cliente'][criteria.historial_cliente] }}</span>
                     </div>
-                    <div class="card-body">
-                        <div class="criteria-detail criteria-{{ criteria.historial_cliente }}">
-                            <strong>Historial con cliente:</strong>
-                            {{ evaluator.evaluation_options['historial_cliente'][criteria.historial_cliente] }}
-	    
-	    <div class="row mb-5">
-    		<div class="col-12 text-center">
-        	    <a href="/export/csv" class="btn btn-success btn-lg me-3">
-            		<i class="fas fa-file-csv me-2"></i>Exportar CSV
-        	    </a>
-        	    <a href="/export/excel" class="btn btn-info btn-lg me-3">
-            		<i class="fas fa-file-excel me-2"></i>Exportar Excel
-        	    </a>
-        	    <button onclick="window.print()" class="btn btn-outline-secondary btn-lg">
-            		<i class="fas fa-print me-2"></i>Imprimir
-        	    </button>
-    		</div>
-	    </div>
+                    <div class="criteria-item-professional criteria-{{ criteria.competencia_directa }}">
+                        <span><strong>Competencia directa:</strong></span>
+                        <span>{{ evaluator.evaluation_options['competencia_directa'][criteria.competencia_directa] }}</span>
+                    </div>
+                    <div class="criteria-item-professional criteria-{{ criteria.madurez_cliente }}">
+                        <span><strong>Madurez del cliente:</strong></span>
+                        <span>{{ evaluator.evaluation_options['madurez_cliente'][criteria.madurez_cliente] }}</span>
+                    </div>
+                    <div class="criteria-item-professional criteria-{{ criteria.naturaleza_poc }}">
+                        <span><strong>Naturaleza del PoC:</strong></span>
+                        <span>{{ evaluator.evaluation_options['naturaleza_poc'][criteria.naturaleza_poc] }}</span>
+                    </div>
+                    <div class="criteria-item-professional criteria-{{ criteria.sponsor_ejecutivo }}">
+                        <span><strong>Sponsor ejecutivo:</strong></span>
+                        <span>{{ evaluator.evaluation_options['sponsor_ejecutivo'][criteria.sponsor_ejecutivo] }}</span>
+                    </div>
+                    <div class="criteria-item-professional criteria-{{ criteria.compromiso_cliente }}">
+                        <span><strong>Compromiso del cliente:</strong></span>
+                        <span>{{ evaluator.evaluation_options['compromiso_cliente'][criteria.compromiso_cliente] }}</span>
+                    </div>
+                    <div class="criteria-item-professional criteria-{{ criteria.complejidad_tecnica }}">
+                        <span><strong>Complejidad técnica:</strong></span>
+                        <span>{{ evaluator.evaluation_options['complejidad_tecnica'][criteria.complejidad_tecnica] }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Professional Action Plan -->
+        <div class="action-plan-professional">
+            <h5 class="mb-3">
+                <i class="fas fa-tasks me-2"></i>Plan de Acción Ejecutivo
+            </h5>
+            <div class="action-steps">
+                {% if 'Crítico' in scores.semaforo %}
+                <div class="action-step">
+                    <span class="action-step-icon">🚫</span>
+                    <h6>No Proceder</h6>
+                    <p>Declinar esta PoC educadamente</p>
+                </div>
+                <div class="action-step">
+                    <span class="action-step-icon">📅</span>
+                    <h6>Seguimiento</h6>
+                    <p>Reagendar en 3-6 meses</p>
+                </div>
+                <div class="action-step">
+                    <span class="action-step-icon">🎯</span>
+                    <h6>Recursos</h6>
+                    <p>Enfocar en oportunidades viables</p>
+                </div>
+                {% elif 'Alto riesgo' in scores.semaforo %}
+                <div class="action-step">
+                    <span class="action-step-icon">⚠️</span>
+                    <h6>Aprobación Gerencial</h6>
+                    <p>Solicitar autorización superior</p>
+                </div>
+                <div class="action-step">
+                    <span class="action-step-icon">📋</span>
+                    <h6>Mitigación</h6>
+                    <p>Documentar riesgos y plan B</p>
+                </div>
+                <div class="action-step">
+                    <span class="action-step-icon">👨‍💼</span>
+                    <h6>Recursos Senior</h6>
+                    <p>Asignar personal experimentado</p>
+                </div>
+                {% elif 'Ideal' in scores.semaforo %}
+                <div class="action-step">
+                    <span class="action-step-icon">🚀</span>
+                    <h6>Proceder</h6>
+                    <p>Condiciones óptimas para éxito</p>
+                </div>
+                <div class="action-step">
+                    <span class="action-step-icon">⭐</span>
+                    <h6>Recursos Premium</h6>
+                    <p>Asignar mejores recursos</p>
+                </div>
+                <div class="action-step">
+                    <span class="action-step-icon">📖</span>
+                    <h6>Caso de Referencia</h6>
+                    <p>Documentar para replicar éxito</p>
+                </div>
+                {% else %}
+                <div class="action-step">
+                    <span class="action-step-icon">📊</span>
+                    <h6>Monitoreo</h6>
+                    <p>Seguimiento semanal cercano</p>
+                </div>
+                <div class="action-step">
+                    <span class="action-step-icon">📞</span>
+                    <h6>Comunicación</h6>
+                    <p>Checkpoints regulares</p>
+                </div>
+                <div class="action-step">
+                    <span class="action-step-icon">📈</span>
+                    <h6>Mejora Continua</h6>
+                    <p>Documentar cambios en condiciones</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Professional Export/Action Buttons -->
+        <div class="text-center mb-5">
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <h5 class="text-light">Acciones Disponibles</h5>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <a href="/" class="btn btn-professional btn-lg w-100">
+                        <i class="fas fa-plus me-2"></i>Nueva Evaluación
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <a href="/export/csv" class="btn btn-success btn-lg w-100">
+                        <i class="fas fa-file-csv me-2"></i>Exportar CSV
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <button onclick="window.print()" class="btn btn-outline-light btn-lg w-100">
+                        <i class="fas fa-print me-2"></i>Imprimir Reporte
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <button onclick="exportToPDF()" class="btn btn-info btn-lg w-100">
+                        <i class="fas fa-file-pdf me-2"></i>Exportar PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Client History Search -->
+        <div class="card mb-4" style="background: rgba(52, 58, 64, 0.95); border: 1px solid rgba(238, 49, 36, 0.2);">
+            <div class="card-header" style="background: linear-gradient(135deg, #6f42c1 0%, #4a148c 100%); color: white;">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>¿El cliente ha mejorado?
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-light">Revisa evaluaciones anteriores de este cliente para comparar el progreso</p>
+                <form method="POST" action="/buscar_cliente" class="d-flex">
+                    <input type="text" name="cliente_buscar" class="form-control me-2" 
+                           value="{{ form_data.cliente }}"
+                           placeholder="Nombre del cliente...">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-search me-1"></i>Ver Historial
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+function exportToPDF() {
+    alert('Funcionalidad de exportación PDF en desarrollo.\n\nPor ahora use la opción de imprimir del navegador:\n\n1. Ctrl+P (Windows) o Cmd+P (Mac)\n2. Seleccionar "Guardar como PDF"\n3. Configurar opciones de impresión');
+}
+
+// Animaciones al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Animar métricas con delay escalonado
+    const metrics = document.querySelectorAll('.metric-card');
+    metrics.forEach((metric, index) => {
+        metric.style.opacity = '0';
+        metric.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+            metric.style.transition = 'all 0.6s ease';
+            metric.style.opacity = '1';
+            metric.style.transform = 'translateY(0)';
+        }, index * 200);
+    });
+
+    // Animar recomendaciones
+    const recommendations = document.querySelectorAll('.recommendation-item');
+    recommendations.forEach((rec, index) => {
+        setTimeout(() => {
+            rec.style.opacity = '0';
+            rec.style.transform = 'translateX(-20px)';
+            setTimeout(() => {
+                rec.style.transition = 'all 0.4s ease';
+                rec.style.opacity = '1';
+                rec.style.transform = 'translateX(0)';
+            }, 50);
+        }, index * 100);
+    });
+
+    // Efecto de hover mejorado en criterios
+    const criteriaItems = document.querySelectorAll('.criteria-item-professional');
+    criteriaItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(15px) scale(1.02)';
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(0) scale(1)';
+        });
+    });
+});
+
+// Confetti effect para resultados exitosos
+{% if 'Ideal' in scores.semaforo %}
+setTimeout(function() {
+    // Simple confetti effect
+    for (let i = 0; i < 50; i++) {
+        setTimeout(function() {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.top = '0px';
+            confetti.style.left = Math.random() * window.innerWidth + 'px';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.background = ['#28a745', '#EE3124', '#ffc107'][Math.floor(Math.random() * 3)];
+            confetti.style.pointerEvents = 'none';
+            confetti.style.borderRadius = '50%';
+            confetti.style.zIndex = '9999';
+            document.body.appendChild(confetti);
+            
+            let fall = 0;
+            const fallInterval = setInterval(function() {
+                fall += 5;
+                confetti.style.top = fall + 'px';
+                confetti.style.transform = 'rotate(' + fall + 'deg)';
+                
+                if (fall > window.innerHeight) {
+                    clearInterval(fallInterval);
+                    document.body.removeChild(confetti);
+                }
+            }, 20);
+        }, i * 50);
+    }
+}, 1000);
+{% endif %}
+</script>
+
+<!-- Enhanced Print Styles -->
+<style media="print">
+    .btn-professional, .card-hover, .metric-card { 
+        box-shadow: none !important; 
+        animation: none !important; 
+        transform: none !important;
+    }
+    
+    .executive-summary { 
+        background: #EE3124 !important; 
+        -webkit-print-color-adjust: exact; 
+    }
+    
+    .breakdown-header.eficiencia {
+        background: #28a745 !important;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    .breakdown-header.riesgo {
+        background: #dc3545 !important;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    .action-plan-professional {
+        background: #6f42c1 !important;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    .header-gradient {
+        background: #EE3124 !important;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    .fortinet-logo {
+        filter: none !important;
+    }
+    
+    @page {
+        margin: 1cm;
+        size: A4;
+    }
+    
+    body {
+        font-size: 12px !important;
+        background: white !important;
+        color: black !important;
+    }
+</style>
+
+</body>
+</html>
