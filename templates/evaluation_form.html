@@ -3,66 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluación PoC Fortinet - Sistema de Riesgo y Eficiencia</title>
+    <title>Fortinet PoC Evaluator - Sistema Profesional</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .fortinet-primary { background-color: #EE3124; }
-        .fortinet-secondary { background-color: #2C3E50; }
-        .card-hover:hover { transform: translateY(-3px); transition: all 0.3s ease; }
-        .header-gradient { 
-            background: linear-gradient(135deg, #EE3124 0%, #c41e3a 100%);
-            color: white;
-        }
-        .criteria-card { 
-            border-left: 4px solid #EE3124; 
-            margin-bottom: 20px;
-        }
-        .score-indicator {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .score-1 { background-color: #28a745; color: white; }
-        .score-2 { background-color: #ffc107; color: #000; }
-        .score-3 { background-color: #dc3545; color: white; }
-        .form-section { margin-bottom: 30px; }
-        .radio-option { 
-            margin: 10px 0; 
-            padding: 10px; 
-            border: 1px solid #ddd; 
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .radio-option:hover { background-color: #f8f9fa; }
-        .radio-option input[type="radio"]:checked + label { font-weight: bold; }
-        .help-text { font-size: 0.9em; color: #666; margin-top: 5px; }
-    </style>
+    <link href="/static/css/fortinet-theme.css" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="https://www.fortinet.com/content/dam/fortinet/images/general/fortinet-favicon.svg">
+    <meta name="description" content="Sistema profesional de evaluación de PoCs para tecnologías Fortinet">
 </head>
 <body class="bg-light">
 
 <div class="container-fluid">
     <!-- Header -->
-    <div class="header-gradient py-4 mb-4">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="mb-0"><i class="fas fa-chart-line me-3"></i>Sistema de Evaluación PoC Fortinet</h1>
-                    <p class="mb-0 opacity-75">Análisis de Riesgo y Eficiencia para Pruebas de Concepto</p>
-                </div>
-                <div class="col-md-4 text-end">
-                    <div class="d-flex justify-content-end align-items-center">
-                        <span class="me-3">
-                            <i class="fas fa-traffic-light me-2"></i>
-                            <small>Sistema de Semáforo Integrado</small>
-                        </span>
+<div class="header-gradient py-4 mb-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center">
+                    <img src="https://www.fortinet.com/content/dam/fortinet/images/general/fortinet-logo.svg" 
+                         alt="Fortinet" class="fortinet-logo me-3">
+                    <div>
+                        <h1 class="mb-0">PoC Evaluator</h1>
+                        <p class="mb-0 opacity-75">Sistema de Análisis de Riesgo y Eficiencia</p>
                     </div>
                 </div>
             </div>
+            <div class="col-md-4 text-end">
+                <span class="badge bg-light text-dark me-2">
+                    <i class="fas fa-shield-alt me-1"></i>Professional
+                </span>
+                <span class="badge bg-light text-dark">
+                    <i class="fas fa-chart-line me-1"></i>Enterprise
+                </span>
+            </div>
         </div>
     </div>
+</div>
 <!-- Buscador de Cliente -->
 <div class="container mb-4">
     <div class="card">
