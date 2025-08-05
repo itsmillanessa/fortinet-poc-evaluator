@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial PoC - {{ cliente }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .header-gradient { 
+            background: linear-gradient(135deg, #EE3124 0%, #c41e3a 100%);
+            color: white;
+        }
+        .timeline-item {
+            border-left: 3px solid #EE3124;
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+        .semaforo-badge {
+            font-size: 1.1em;
+            padding: 8px 15px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="header-gradient py-4 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-0">
+                        <i class="fas fa-history me-3"></i>Historial PoC: {{ cliente }}
+                    </h1>
+                    <p class="mb-0 opacity-75">{{ evaluaciones|length }} evaluación(es) encontrada(s)</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="/" class="btn btn-light me-2">
+                        <i class="fas fa-plus me-2"></i>Nueva Evaluación
+                    </a>
+                    <a href="/" class="btn btn-outline-light">
+                        <i class="fas fa-arrow-left me-2"></i>Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        {% if evaluaciones %}
+            <!-- Progreso del Cliente -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Evolución del Cliente
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for evaluacion in evaluaciones %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 timeline-item">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title">{{ evaluacion.proyecto }}</h6>
+                                        <small class="text-muted">{{ evaluacion.fecha }}</small>
+                                    </div>
+                                    
+                                    <div class="text-center mb-3">
+                                        <span class="badge bg-{{ evaluacion.color_class }} semaforo-badge">
+                                            {{ evaluacion.semaforo }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <small class="text-muted">Eficiencia</small>
+                                            <div class="fw-bold">{{ evaluacion.eficiencia_total }}/24</div>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted">Riesgo</small>
+                                            <div class="fw-bold">{{ evaluacion.riesgo_total }}/21</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-1"></i>{{ evaluacion.responsable }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acción para Nueva Evaluación -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5>¿El cliente ha mejorado sus condiciones?</h5>
+                    <p class="text-muted">Realiza una nueva evaluación para comparar el progreso</p>
+                    <a href="/?cliente={{ cliente }}" class="btn btn-success btn-lg">
+                        <i class="fas fa-plus-circle me-2"></i>Nueva Evaluación para {{ cliente }}
+                    </a>
+                </div>
+            </div>
+
+        {% else %}
+            <!-- No hay evaluaciones -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4>No se encontraron evaluaciones</h4>
+                    <p class="text-muted">No hay evaluaciones previas para "{{ cliente }}"</p>
+                    <a href="/?cliente={{ cliente }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Crear Primera Evaluación
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -563,6 +563,102 @@ def api_evaluate():
             'error': str(e),
             'status': 'error'
         }), 400
+@app.route('/cliente/<string:nombre_cliente>')
+def historial_cliente(nombre_cliente):
+    """Ver historial de evaluaciones de un cliente específico"""
+    try:
+        headers = {
+            'Authorization': f'Bearer {NOTION_TOKEN}',
+            'Notion-Version': '2022-06-28'
+        }
+        
+        # Buscar todas las PoCs de este cliente
+        response = requests.post(
+            f'https://api.notion.com/v1/databases/{NOTION_DATABASE_ID}/query',
+            headers=headers,
+            json={
+                "filter": {
+                    "property": "Cliente",
+                    "title": {
+                        "contains": nombre_cliente
+                    }
+                },
+                "sorts": [
+                    {
+                        "property": "Fecha de evaluación",
+                        "direction": "descending"
+                    }
+                ]
+            }
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            evaluaciones = []
+            
+            for page in data.get('results', []):
+                props = page.get('properties', {})
+                
+                # Calcular semáforo basado en los scores
+                eficiencia = props.get('Eficiencia_total', {}).get('number', 0)
+                riesgo = props.get('Riesgo_total', {}).get('number', 0)
+                
+                # Aplicar tu lógica de semáforo
+                if riesgo <= 10 and eficiencia <= 10:
+                    semaforo = "🟢 Ideal"
+                    color_class = "success"
+                elif riesgo <= 10 and eficiencia <= 16:
+                    semaforo = "🟡 Bueno"
+                    color_class = "warning"
+                elif riesgo <= 14 and eficiencia <= 10:
+                    semaforo = "🟡 Aceptable"
+                    color_class = "warning"
+                elif riesgo <= 14 and eficiencia <= 16:
+                    semaforo = "🟠 Cuidado"
+                    color_class = "orange"
+                elif riesgo > 14 and eficiencia <= 16:
+                    semaforo = "🟠 Alto riesgo"
+                    color_class = "orange"
+                else:
+                    semaforo = "🔴 Crítico"
+                    color_class = "danger"
+                
+                evaluacion = {
+                    'id': page.get('id'),
+                    'cliente': props.get('Cliente', {}).get('title', [{}])[0].get('text', {}).get('content', ''),
+                    'proyecto': props.get('Proyecto', {}).get('select', {}).get('name', ''),
+                    'responsable': props.get('Responsable Preventa', {}).get('select', {}).get('name', ''),
+                    'fecha': props.get('Fecha de evaluación', {}).get('date', {}).get('start', ''),
+                    'eficiencia_total': eficiencia,
+                    'riesgo_total': riesgo,
+                    'semaforo': semaforo,
+                    'color_class': color_class,
+                    'estado': props.get('Estado', {}).get('status', {}).get('name', ''),
+                }
+                evaluaciones.append(evaluacion)
+            
+            return render_template('historial_cliente.html', 
+                                 cliente=nombre_cliente, 
+                                 evaluaciones=evaluaciones,
+                                 evaluator=evaluator)
+        else:
+            flash('Error al obtener historial del cliente', 'error')
+            return redirect(url_for('index'))
+            
+    except Exception as e:
+        logger.error(f"Error en historial cliente: {str(e)}")
+        flash(f'Error al cargar historial: {str(e)}', 'error')
+        return redirect(url_for('index'))
+
+@app.route('/buscar_cliente', methods=['POST'])
+def buscar_cliente():
+    """Buscar evaluaciones de un cliente"""
+    cliente = request.form.get('cliente_buscar', '').strip()
+    if cliente:
+        return redirect(url_for('historial_cliente', nombre_cliente=cliente))
+    else:
+        flash('Por favor ingrese un nombre de cliente', 'warning')
+        return redirect(url_for('index'))
 
 if __name__ == '__main__':
     import os

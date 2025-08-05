@@ -64,6 +64,14 @@
         </div>
     </div>
 
+<script>
+// Prellenar cliente si viene de búsqueda
+const urlParams = new URLSearchParams(window.location.search);
+const cliente = urlParams.get('cliente');
+if (cliente) {
+    document.getElementById('cliente').value = cliente;
+}
+</script>
     <div class="container">
         <!-- Mensajes Flash -->
         {% with messages = get_flashed_messages(with_categories=true) %}
