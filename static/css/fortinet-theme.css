@@ -1,4 +1,4 @@
-/* Fortinet Professional Theme */
+/* Fortinet Professional Theme - Fixed Contrast */
 :root {
     --fortinet-red: #EE3124;
     --fortinet-dark-red: #B71C1C;
@@ -20,6 +20,11 @@ body {
 .header-gradient {
     background: linear-gradient(135deg, var(--fortinet-red) 0%, var(--fortinet-dark-red) 100%);
     box-shadow: 0 4px 15px rgba(238, 49, 36, 0.3);
+    color: #FFFFFF !important;
+}
+
+.header-gradient h1, .header-gradient p, .header-gradient span {
+    color: #FFFFFF !important;
 }
 
 /* Cards con diseño oscuro profesional */
@@ -28,77 +33,85 @@ body {
     border: 1px solid rgba(238, 49, 36, 0.2);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px);
+    color: #FFFFFF;
+}
+
+.card-body {
+    color: #FFFFFF !important;
 }
 
 .card-header {
     background: linear-gradient(135deg, var(--fortinet-charcoal) 0%, var(--fortinet-dark-gray) 100%);
-    color: #FFFFFF;
+    color: #FFFFFF !important;
     border-bottom: 2px solid var(--fortinet-red);
+}
+
+.card-header h4, .card-header h5, .card-header h6 {
+    color: #FFFFFF !important;
+}
+
+/* Labels y texto de formularios */
+.form-label {
+    color: #FFFFFF !important;
+    font-weight: 500;
+}
+
+.help-text {
+    color: rgba(255, 255, 255, 0.7) !important;
 }
 
 /* Formularios con estilo oscuro */
 .form-control, .form-select {
     background-color: rgba(248, 249, 250, 0.1);
     border: 1px solid rgba(238, 49, 36, 0.3);
-    color: #FFFFFF;
+    color: #FFFFFF !important;
 }
 
 .form-control:focus, .form-select:focus {
     background-color: rgba(248, 249, 250, 0.15);
     border-color: var(--fortinet-red);
     box-shadow: 0 0 0 0.2rem rgba(238, 49, 36, 0.25);
-    color: #FFFFFF;
+    color: #FFFFFF !important;
 }
 
 .form-control::placeholder {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.6) !important;
 }
 
-/* Botones con estilo Fortinet */
-.btn-primary {
-    background: linear-gradient(135deg, var(--fortinet-red) 0%, var(--fortinet-dark-red) 100%);
-    border: none;
-    box-shadow: 0 4px 15px rgba(238, 49, 36, 0.3);
-    transition: all 0.3s ease;
+.form-select option {
+    background-color: var(--fortinet-dark-gray);
+    color: #FFFFFF;
 }
 
-.btn-primary:hover {
-    background: linear-gradient(135deg, var(--fortinet-dark-red) 0%, #8B0000 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(238, 49, 36, 0.4);
+/* Texto en general */
+h1, h2, h3, h4, h5, h6, p, span, div, label {
+    color: #FFFFFF;
 }
 
-.btn-outline-primary {
-    color: var(--fortinet-red);
-    border-color: var(--fortinet-red);
-}
-
-.btn-outline-primary:hover {
-    background-color: var(--fortinet-red);
-    border-color: var(--fortinet-red);
-}
-
-/* Criterios con colores mejorados */
+/* Criterios con colores mejorados y texto legible */
 .criteria-1 { 
     background: linear-gradient(135deg, rgba(40, 167, 69, 0.2) 0%, rgba(40, 167, 69, 0.1) 100%);
     border-left: 4px solid #28a745;
+    color: #FFFFFF !important;
 }
 
 .criteria-2 { 
     background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 193, 7, 0.1) 100%);
     border-left: 4px solid #ffc107;
+    color: #FFFFFF !important;
 }
 
 .criteria-3 { 
     background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(220, 53, 69, 0.1) 100%);
     border-left: 4px solid #dc3545;
+    color: #FFFFFF !important;
 }
 
 /* Radio options con mejor visibilidad */
 .radio-option {
     background: rgba(248, 249, 250, 0.05);
     border: 1px solid rgba(238, 49, 36, 0.2);
-    color: #FFFFFF;
+    color: #FFFFFF !important;
     transition: all 0.3s ease;
 }
 
@@ -108,10 +121,62 @@ body {
     transform: translateX(5px);
 }
 
-/* Score circles mejorados */
-.score-circle {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    border: 3px solid rgba(255, 255, 255, 0.1);
+.radio-option label {
+    color: #FFFFFF !important;
+}
+
+/* Score indicators */
+.score-indicator {
+    color: #000 !important; /* Texto negro para los badges de score */
+}
+
+.score-1 { background-color: #28a745; color: #FFFFFF !important; }
+.score-2 { background-color: #ffc107; color: #000 !important; }
+.score-3 { background-color: #dc3545; color: #FFFFFF !important; }
+
+/* Botones con estilo Fortinet */
+.btn-primary {
+    background: linear-gradient(135deg, var(--fortinet-red) 0%, var(--fortinet-dark-red) 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(238, 49, 36, 0.3);
+    transition: all 0.3s ease;
+    color: #FFFFFF !important;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--fortinet-dark-red) 0%, #8B0000 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(238, 49, 36, 0.4);
+    color: #FFFFFF !important;
+}
+
+.btn-outline-primary {
+    color: var(--fortinet-red) !important;
+    border-color: var(--fortinet-red);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--fortinet-red) !important;
+    border-color: var(--fortinet-red);
+    color: #FFFFFF !important;
+}
+
+/* Texto de validación */
+.invalid-feedback {
+    color: #dc3545 !important;
+}
+
+.form-text {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Badges */
+.badge {
+    color: #000 !important;
+}
+
+.badge.bg-light {
+    color: #000 !important;
 }
 
 /* Logo Fortinet */
@@ -120,54 +185,47 @@ body {
     filter: brightness(0) invert(1); /* Logo blanco */
 }
 
-/* Alerts oscuros */
+/* Alerts con mejor contraste */
 .alert {
     background: rgba(52, 58, 64, 0.9);
     border: 1px solid rgba(238, 49, 36, 0.3);
-    color: #FFFFFF;
+    color: #FFFFFF !important;
 }
 
 .alert-success {
-    background: rgba(40, 167, 69, 0.2);
+    background: rgba(40, 167, 69, 0.2) !important;
     border-color: #28a745;
+    color: #FFFFFF !important;
 }
 
 .alert-warning {
-    background: rgba(255, 193, 7, 0.2);
+    background: rgba(255, 193, 7, 0.2) !important;
     border-color: #ffc107;
-    color: #000;
+    color: #000 !important;
 }
 
 .alert-danger {
-    background: rgba(220, 53, 69, 0.2);
+    background: rgba(220, 53, 69, 0.2) !important;
     border-color: #dc3545;
+    color: #FFFFFF !important;
 }
 
-/* Navegación mejorada */
-.navbar-brand {
-    font-weight: 700;
-    font-size: 1.5rem;
+/* Small text */
+small {
+    color: rgba(255, 255, 255, 0.7) !important;
 }
 
-/* Semáforo con mejor contraste */
-.semaforo-verde { 
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    box-shadow: 0 0 20px rgba(40, 167, 69, 0.5);
+.text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
 }
 
-.semaforo-amarillo { 
-    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
+/* Links */
+a {
+    color: var(--fortinet-red) !important;
 }
 
-.semaforo-naranja { 
-    background: linear-gradient(135deg, #fd7e14 0%, #dc3545 100%);
-    box-shadow: 0 0 20px rgba(253, 126, 20, 0.5);
-}
-
-.semaforo-rojo { 
-    background: linear-gradient(135deg, #dc3545 0%, #6f42c1 100%);
-    box-shadow: 0 0 20px rgba(220, 53, 69, 0.5);
+a:hover {
+    color: var(--fortinet-dark-red) !important;
 }
 
 /* Responsive improvements */
