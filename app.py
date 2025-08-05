@@ -551,10 +551,9 @@ def api_evaluate():
         }), 400
 
 if __name__ == '__main__':
-    # Crear directorio de templates si no existe
-    os.makedirs('templates', exist_ok=True)
-    os.makedirs('static', exist_ok=True)
-    
-import os
-port = int(os.environ.get('PORT', 5000))
-app.run(debug=False, host='0.0.0.0', port=port)
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
+else:
+    # Para Railway/Gunicorn
+    import os
