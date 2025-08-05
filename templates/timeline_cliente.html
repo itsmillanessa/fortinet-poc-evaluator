@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline - {{ cliente }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .timeline-entry {
+            border-left: 4px solid #dee2e6;
+            margin-left: 2rem;
+            padding-left: 2rem;
+            padding-bottom: 2rem;
+            position: relative;
+        }
+        .timeline-entry::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 1rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #6c757d;
+        }
+        .timeline-entry.success::before { background: #28a745; }
+        .timeline-entry.warning::before { background: #ffc107; }
+        .timeline-entry.danger::before { background: #dc3545; }
+        .timeline-entry.success { border-left-color: #28a745; }
+        .timeline-entry.warning { border-left-color: #ffc107; }
+        .timeline-entry.danger { border-left-color: #dc3545; }
+        
+        .score-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .evolution-chart {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-chart-line me-2"></i>PoC Evaluator
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">
+                    <i class="fas fa-home me-1"></i>Inicio
+                </a>
+                <a class="nav-link" href="/historial">
+                    <i class="fas fa-history me-1"></i>Historial
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">
+                            <i class="fas fa-timeline me-2"></i>
+                            Timeline de Evolución: {{ cliente }}
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        {% if timeline %}
+                            <!-- Resumen de evolución -->
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <div class="score-card">
+                                        <h5>Total de Evaluaciones</h5>
+                                        <h2>{{ timeline|length }}</h2>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="score-card">
+                                        <h5>Estado Actual</h5>
+                                        <h3>{{ timeline[-1].semaforo }}</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="score-card">
+                                        <h5>Última Actualización</h5>
+                                        <h4>{{ timeline[-1].fecha }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Timeline entries -->
+                            <div class="timeline-container">
+                                {% for entry in timeline %}
+                                <div class="timeline-entry {{ entry.color_class }}">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <div>
+                                                    <h5 class="mb-1">
+                                                        {% if entry.is_timeline %}
+                                                            <i class="fas fa-edit me-2"></i>Actualización
+                                                        {% else %}
+                                                            <i class="fas fa-plus-circle me-2"></i>Evaluación Inicial
+                                                        {% endif %}
+                                                    </h5>
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-calendar me-1"></i>{{ entry.fecha }}
+                                                        <i class="fas fa-user ms-3 me-1"></i>{{ entry.responsable }}
+                                                    </small>
+                                                </div>
+                                                <span class="badge bg-{{ entry.color_class }} fs-6">
+                                                    {{ entry.semaforo }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="row text-center">
+                                                <div class="col-6">
+                                                    <div class="metric-box">
+                                                        <small class="text-muted">Eficiencia</small>
+                                                        <h4 class="mb-0">{{ entry.eficiencia_total }}</h4>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="metric-box">
+                                                        <small class="text-muted">Riesgo</small>
+                                                        <h4 class="mb-0">{{ entry.riesgo_total }}</h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Análisis de evolución -->
+                            <div class="evolution-chart mt-4">
+                                <h4><i class="fas fa-chart-area me-2"></i>Análisis de Evolución</h4>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <canvas id="evolutionChart" width="400" height="200"></canvas>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Tendencias observadas:</h6>
+                                        <ul class="list-unstyled">
+                                            {% set first_entry = timeline[0] %}
+                                            {% set last_entry = timeline[-1] %}
+                                            {% if last_entry.eficiencia_total < first_entry.eficiencia_total %}
+                                                <li><i class="fas fa-arrow-down text-success me-2"></i>Mejora en eficiencia</li>
+                                            {% elif last_entry.eficiencia_total > first_entry.eficiencia_total %}
+                                                <li><i class="fas fa-arrow-up text-warning me-2"></i>Eficiencia necesita atención</li>
+                                            {% endif %}
+                                            
+                                            {% if last_entry.riesgo_total < first_entry.riesgo_total %}
+                                                <li><i class="fas fa-arrow-down text-success me-2"></i>Reducción de riesgo</li>
+                                            {% elif last_entry.riesgo_total > first_entry.riesgo_total %}
+                                                <li><i class="fas fa-arrow-up text-danger me-2"></i>Aumento de riesgo</li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                <h4>No se encontraron evaluaciones</h4>
+                                <p class="text-muted">No hay historial disponible para este cliente.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Crear gráfico de evolución
+        {% if timeline %}
+        const ctx = document.getElementById('evolutionChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [{% for entry in timeline %}'{{ entry.fecha }}'{% if not loop.last %},{% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Eficiencia',
+                    data: [{% for entry in timeline %}{{ entry.eficiencia_total }}{% if not loop.last %},{% endif %}{% endfor %}],
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1
+                }, {
+                    label: 'Riesgo',
+                    data: [{% for entry in timeline %}{{ entry.riesgo_total }}{% if not loop.last %},{% endif %}{% endfor %}],
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Evolución de Métricas'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 21
+                    }
+                }
+            }
+        });
+        {% endif %}
+    </script>
+</body>
+</html>

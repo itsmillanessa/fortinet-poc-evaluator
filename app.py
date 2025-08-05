@@ -276,7 +276,7 @@ def send_to_notion(data: Dict) -> bool:
     
     # Mapear valores a formato de tu BD
     def map_select_value(field_name, value):
-        return evaluator.evaluation_options[field_name][value]
+        return evaluator.evaluation_options[field_name][int(value)]
     
     # Estructura de datos para Notion (SOLO campos editables)
     notion_data = {
@@ -659,6 +659,555 @@ def buscar_cliente():
     else:
         flash('Por favor ingrese un nombre de cliente', 'warning')
         return redirect(url_for('index'))
+
+@app.route('/editar/<string:notion_page_id>')
+def editar_evaluacion(notion_page_id):
+    """Cargar evaluación existente para editar"""
+    try:
+        headers = {
+            'Authorization': f'Bearer {NOTION_TOKEN}',
+            'Notion-Version': '2022-06-28'
+        }
+        
+        # Obtener la página específica de Notion
+        response = requests.get(
+            f'https://api.notion.com/v1/pages/{notion_page_id}',
+            headers=headers
+        )
+        
+        if response.status_code == 200:
+            page_data = response.json()
+            props = page_data.get('properties', {})
+            
+            # Mapear datos de Notion de vuelta al formulario
+            def reverse_map_value(field_name, notion_value):
+                option_text = notion_value.get('select', {}).get('name', '')
+                for key, text in evaluator.evaluation_options[field_name].items():
+                    if text == option_text:
+                        return key
+                return 3  # Default
+            
+            # Extraer datos para prellenar el formulario
+            evaluacion_data = {
+                'cliente': props.get('Cliente', {}).get('title', [{}])[0].get('text', {}).get('content', ''),
+                'proyecto': props.get('Proyecto', {}).get('select', {}).get('name', ''),
+                'responsable_preventa': props.get('Responsable Preventa', {}).get('select', {}).get('name', ''),
+                'descripcion': '',  # No se guarda en Notion actualmente
+                'tiempo_cierre_comercial': reverse_map_value('tiempo_cierre_comercial', props.get('Tiempo para cierre comercial', {})),
+                'recursos_preventa': reverse_map_value('recursos_preventa', props.get('Recursos preventa requeridos', {})),
+                'historial_cliente': reverse_map_value('historial_cliente', props.get('Historial con el cliente', {})),
+                'competencia_directa': reverse_map_value('competencia_directa', props.get('Competencia directa', {})),
+                'madurez_cliente': reverse_map_value('madurez_cliente', props.get('Madurez del cliente', {})),
+                'naturaleza_poc': reverse_map_value('naturaleza_poc', props.get('Naturaleza del PoC', {})),
+                'sponsor_ejecutivo': reverse_map_value('sponsor_ejecutivo', props.get('Sponsor ejecutivo', {})),
+                'compromiso_cliente': reverse_map_value('compromiso_cliente', props.get('Compromiso del cliente', {})),
+                'complejidad_tecnica': reverse_map_value('complejidad_tecnica', props.get('Complejidad técnica', {})),
+                'monto_proyecto': reverse_map_value('monto_proyecto', props.get('Monto del proyecto', {})),
+                'potencial_comercial': reverse_map_value('potencial_comercial', props.get('Potencial comercial', {})),
+                'poc_definida': reverse_map_value('poc_definida', props.get('PoC bien definida', {})),
+                'plazo_ejecucion': reverse_map_value('plazo_ejecucion', props.get('Plazo de ejecución', {})),
+                'entorno_pruebas': reverse_map_value('entorno_pruebas', props.get('Entorno de pruebas', {})),
+                'presupuesto_definido': reverse_map_value('presupuesto_definido', props.get('Presupuesto definido', {})),
+                'notion_page_id': notion_page_id,  # Para saber que es una edición
+                'fecha_original': props.get('Fecha de evaluación', {}).get('date', {}).get('start', '')
+            }
+            
+            return render_template('evaluation_form.html', 
+                                 evaluator=evaluator,
+                                 edit_data=evaluacion_data,
+                                 is_edit=True)
+        else:
+            flash('Error al cargar evaluación para editar', 'error')
+            return redirect(url_for('index'))
+            
+    except Exception as e:
+        logger.error(f"Error al cargar evaluación: {str(e)}")
+        flash(f'Error al cargar evaluación: {str(e)}', 'error')
+        return redirect(url_for('index'))
+
+@app.route('/actualizar', methods=['POST'])
+def actualizar_evaluacion():
+    """Actualizar evaluación existente y crear entrada de timeline"""
+    try:
+        form_data = request.form.to_dict()
+        notion_page_id = form_data.get('notion_page_id')
+        
+        if not notion_page_id:
+            flash('Error: ID de evaluación no encontrado', 'error')
+            return redirect(url_for('index'))
+        
+        # Crear objeto de criterios
+        criteria = PoCEvaluationCriteria(
+            tiempo_cierre_comercial=int(form_data.get('tiempo_cierre_comercial', 3)),
+            recursos_preventa=int(form_data.get('recursos_preventa', 3)),
+            historial_cliente=int(form_data.get('historial_cliente', 3)),
+            competencia_directa=int(form_data.get('competencia_directa', 3)),
+            madurez_cliente=int(form_data.get('madurez_cliente', 3)),
+            naturaleza_poc=int(form_data.get('naturaleza_poc', 3)),
+            sponsor_ejecutivo=int(form_data.get('sponsor_ejecutivo', 3)),
+            compromiso_cliente=int(form_data.get('compromiso_cliente', 3)),
+            complejidad_tecnica=int(form_data.get('complejidad_tecnica', 3)),
+            monto_proyecto=int(form_data.get('monto_proyecto', 3)),
+            potencial_comercial=int(form_data.get('potencial_comercial', 3)),
+            poc_definida=int(form_data.get('poc_definida', 3)),
+            plazo_ejecucion=int(form_data.get('plazo_ejecucion', 3)),
+            entorno_pruebas=int(form_data.get('entorno_pruebas', 3)),
+            presupuesto_definido=int(form_data.get('presupuesto_definido', 3))
+        )
+        
+        # Calcular nuevas puntuaciones
+        scores = evaluator.calculate_scores(criteria)
+        recommendations = evaluator.get_recommendations(criteria, scores)
+        
+        # Actualizar el registro existente en Notion
+        success = update_notion_record(notion_page_id, {
+            **form_data,
+            **scores,
+            **{k: v for k, v in criteria.__dict__.items()}
+        })
+        
+        # Crear entrada de timeline (nuevo registro)
+        timeline_success = create_timeline_entry({
+            **form_data,
+            **scores,
+            **{k: v for k, v in criteria.__dict__.items()},
+            'fecha_original': form_data.get('fecha_original', ''),
+            'tipo_actualizacion': 'Reevaluación'
+        })
+        
+        if success:
+            flash('¡Evaluación actualizada exitosamente! Se creó entrada en el timeline.', 'success')
+        else:
+            flash('Evaluación procesada pero error al actualizar en Notion.', 'warning')
+        
+        current_date = datetime.now().strftime('%d/%m/%Y')
+        
+        return render_template('evaluation_results.html', 
+                             scores=scores,
+                             recommendations=recommendations,
+                             form_data=form_data,
+                             criteria=criteria,
+                             evaluator=evaluator,
+                             current_date=current_date,
+                             is_update=True)
+                             
+    except Exception as e:
+        logger.error(f"Error en actualización: {str(e)}")
+        flash(f'Error al actualizar evaluación: {str(e)}', 'error')
+        return redirect(url_for('index'))
+
+def update_notion_record(page_id, data):
+    """Actualizar registro existente en Notion"""
+    headers = {
+        'Authorization': f'Bearer {NOTION_TOKEN}',
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+    }
+    
+    def map_select_value(field_name, value):
+        return evaluator.evaluation_options[field_name][value]
+    
+    # Estructura para actualizar (PATCH)
+    notion_data = {
+        "properties": {
+            "Fecha de evaluación": {
+                "date": {"start": datetime.now().isoformat().split('T')[0]}
+            },
+            "Estado": {
+                "status": {"name": "Actualizado"}
+            },
+            "Tiempo para cierre comercial": {
+                "select": {"name": map_select_value('tiempo_cierre_comercial', data.get('tiempo_cierre_comercial', 3))}
+            },
+            "Recursos preventa requeridos": {
+                "select": {"name": map_select_value('recursos_preventa', data.get('recursos_preventa', 3))}
+            },
+            "Historial con el cliente": {
+                "select": {"name": map_select_value('historial_cliente', data.get('historial_cliente', 3))}
+            },
+            "Competencia directa": {
+                "select": {"name": map_select_value('competencia_directa', data.get('competencia_directa', 3))}
+            },
+            "Madurez del cliente": {
+                "select": {"name": map_select_value('madurez_cliente', data.get('madurez_cliente', 3))}
+            },
+            "Naturaleza del PoC": {
+                "select": {"name": map_select_value('naturaleza_poc', data.get('naturaleza_poc', 3))}
+            },
+            "Sponsor ejecutivo": {
+                "select": {"name": map_select_value('sponsor_ejecutivo', data.get('sponsor_ejecutivo', 3))}
+            },
+            "Compromiso del cliente": {
+                "select": {"name": map_select_value('compromiso_cliente', data.get('compromiso_cliente', 3))}
+            },
+            "Complejidad técnica": {
+                "select": {"name": map_select_value('complejidad_tecnica', data.get('complejidad_tecnica', 3))}
+            },
+            "Monto del proyecto": {
+                "select": {"name": map_select_value('monto_proyecto', data.get('monto_proyecto', 3))}
+            },
+            "Potencial comercial": {
+                "select": {"name": map_select_value('potencial_comercial', data.get('potencial_comercial', 3))}
+            },
+            "PoC bien definida": {
+                "select": {"name": map_select_value('poc_definida', data.get('poc_definida', 3))}
+            },
+            "Plazo de ejecución": {
+                "select": {"name": map_select_value('plazo_ejecucion', data.get('plazo_ejecucion', 3))}
+            },
+            "Entorno de pruebas": {
+                "select": {"name": map_select_value('entorno_pruebas', data.get('entorno_pruebas', 3))}
+            },
+            "Presupuesto definido": {
+                "select": {"name": map_select_value('presupuesto_definido', data.get('presupuesto_definido', 3))}
+            },
+            "Eficiencia_total": {
+                "number": data.get('eficiencia_total', 0)
+            },
+            "Riesgo_total": {
+                "number": data.get('riesgo_total', 0)
+            }
+        }
+    }
+    
+    try:
+        response = requests.patch(
+            f'https://api.notion.com/v1/pages/{page_id}',
+            headers=headers,
+            json=notion_data
+        )
+        
+        return response.status_code == 200
+    except Exception as e:
+        logger.error(f"Error al actualizar Notion: {str(e)}")
+        return False
+
+def create_timeline_entry(data):
+    """Crear nueva entrada en timeline (copia con fecha actual)"""
+    # Usar la función send_to_notion existente pero con datos de timeline
+    timeline_data = data.copy()
+    timeline_data['cliente'] = f"{data.get('cliente', '')} - Timeline"
+    
+    return send_to_notion(timeline_data)
+
+# Agregar estas rutas después de las existentes en app.py
+
+@app.route('/editar/<string:notion_page_id>')
+def editar_evaluacion(notion_page_id):
+    """Cargar evaluación existente para editar"""
+    try:
+        headers = {
+            'Authorization': f'Bearer {NOTION_TOKEN}',
+            'Notion-Version': '2022-06-28'
+        }
+        
+        # Obtener la página específica de Notion
+        response = requests.get(
+            f'https://api.notion.com/v1/pages/{notion_page_id}',
+            headers=headers
+        )
+        
+        if response.status_code == 200:
+            page_data = response.json()
+            props = page_data.get('properties', {})
+            
+            # Mapear datos de Notion de vuelta al formulario
+            def reverse_map_value(field_name, notion_value):
+                option_text = notion_value.get('select', {}).get('name', '')
+                for key, text in evaluator.evaluation_options[field_name].items():
+                    if text == option_text:
+                        return key
+                return 3  # Default
+            
+            # Extraer datos para prellenar el formulario
+            evaluacion_data = {
+                'cliente': props.get('Cliente', {}).get('title', [{}])[0].get('text', {}).get('content', ''),
+                'proyecto': props.get('Proyecto', {}).get('select', {}).get('name', ''),
+                'responsable_preventa': props.get('Responsable Preventa', {}).get('select', {}).get('name', ''),
+                'descripcion': '',  # No se guarda en Notion actualmente
+                'tiempo_cierre_comercial': reverse_map_value('tiempo_cierre_comercial', props.get('Tiempo para cierre comercial', {})),
+                'recursos_preventa': reverse_map_value('recursos_preventa', props.get('Recursos preventa requeridos', {})),
+                'historial_cliente': reverse_map_value('historial_cliente', props.get('Historial con el cliente', {})),
+                'competencia_directa': reverse_map_value('competencia_directa', props.get('Competencia directa', {})),
+                'madurez_cliente': reverse_map_value('madurez_cliente', props.get('Madurez del cliente', {})),
+                'naturaleza_poc': reverse_map_value('naturaleza_poc', props.get('Naturaleza del PoC', {})),
+                'sponsor_ejecutivo': reverse_map_value('sponsor_ejecutivo', props.get('Sponsor ejecutivo', {})),
+                'compromiso_cliente': reverse_map_value('compromiso_cliente', props.get('Compromiso del cliente', {})),
+                'complejidad_tecnica': reverse_map_value('complejidad_tecnica', props.get('Complejidad técnica', {})),
+                'monto_proyecto': reverse_map_value('monto_proyecto', props.get('Monto del proyecto', {})),
+                'potencial_comercial': reverse_map_value('potencial_comercial', props.get('Potencial comercial', {})),
+                'poc_definida': reverse_map_value('poc_definida', props.get('PoC bien definida', {})),
+                'plazo_ejecucion': reverse_map_value('plazo_ejecucion', props.get('Plazo de ejecución', {})),
+                'entorno_pruebas': reverse_map_value('entorno_pruebas', props.get('Entorno de pruebas', {})),
+                'presupuesto_definido': reverse_map_value('presupuesto_definido', props.get('Presupuesto definido', {})),
+                'notion_page_id': notion_page_id,  # Para saber que es una edición
+                'fecha_original': props.get('Fecha de evaluación', {}).get('date', {}).get('start', '')
+            }
+            
+            return render_template('evaluation_form.html', 
+                                 evaluator=evaluator,
+                                 edit_data=evaluacion_data,
+                                 is_edit=True)
+        else:
+            flash('Error al cargar evaluación para editar', 'error')
+            return redirect(url_for('index'))
+            
+    except Exception as e:
+        logger.error(f"Error al cargar evaluación: {str(e)}")
+        flash(f'Error al cargar evaluación: {str(e)}', 'error')
+        return redirect(url_for('index'))
+
+@app.route('/actualizar', methods=['POST'])
+def actualizar_evaluacion():
+    """Actualizar evaluación existente y crear entrada de timeline"""
+    try:
+        form_data = request.form.to_dict()
+        notion_page_id = form_data.get('notion_page_id')
+        
+        if not notion_page_id:
+            flash('Error: ID de evaluación no encontrado', 'error')
+            return redirect(url_for('index'))
+        
+        # Crear objeto de criterios
+        criteria = PoCEvaluationCriteria(
+            tiempo_cierre_comercial=int(form_data.get('tiempo_cierre_comercial', 3)),
+            recursos_preventa=int(form_data.get('recursos_preventa', 3)),
+            historial_cliente=int(form_data.get('historial_cliente', 3)),
+            competencia_directa=int(form_data.get('competencia_directa', 3)),
+            madurez_cliente=int(form_data.get('madurez_cliente', 3)),
+            naturaleza_poc=int(form_data.get('naturaleza_poc', 3)),
+            sponsor_ejecutivo=int(form_data.get('sponsor_ejecutivo', 3)),
+            compromiso_cliente=int(form_data.get('compromiso_cliente', 3)),
+            complejidad_tecnica=int(form_data.get('complejidad_tecnica', 3)),
+            monto_proyecto=int(form_data.get('monto_proyecto', 3)),
+            potencial_comercial=int(form_data.get('potencial_comercial', 3)),
+            poc_definida=int(form_data.get('poc_definida', 3)),
+            plazo_ejecucion=int(form_data.get('plazo_ejecucion', 3)),
+            entorno_pruebas=int(form_data.get('entorno_pruebas', 3)),
+            presupuesto_definido=int(form_data.get('presupuesto_definido', 3))
+        )
+        
+        # Calcular nuevas puntuaciones
+        scores = evaluator.calculate_scores(criteria)
+        recommendations = evaluator.get_recommendations(criteria, scores)
+        
+        # Actualizar el registro existente en Notion
+        success = update_notion_record(notion_page_id, {
+            **form_data,
+            **scores,
+            **{k: v for k, v in criteria.__dict__.items()}
+        })
+        
+        # Crear entrada de timeline (nuevo registro)
+        timeline_success = create_timeline_entry({
+            **form_data,
+            **scores,
+            **{k: v for k, v in criteria.__dict__.items()},
+            'fecha_original': form_data.get('fecha_original', ''),
+            'tipo_actualizacion': 'Reevaluación'
+        })
+        
+        if success:
+            flash('¡Evaluación actualizada exitosamente! Se creó entrada en el timeline.', 'success')
+        else:
+            flash('Evaluación procesada pero error al actualizar en Notion.', 'warning')
+        
+        current_date = datetime.now().strftime('%d/%m/%Y')
+        
+        return render_template('evaluation_results.html', 
+                             scores=scores,
+                             recommendations=recommendations,
+                             form_data=form_data,
+                             criteria=criteria,
+                             evaluator=evaluator,
+                             current_date=current_date,
+                             is_update=True)
+                             
+    except Exception as e:
+        logger.error(f"Error en actualización: {str(e)}")
+        flash(f'Error al actualizar evaluación: {str(e)}', 'error')
+        return redirect(url_for('index'))
+
+@app.route('/timeline/<string:cliente>')
+def timeline_cliente(cliente):
+    """Mostrar timeline completo de evolución del cliente"""
+    try:
+        headers = {
+            'Authorization': f'Bearer {NOTION_TOKEN}',
+            'Notion-Version': '2022-06-28'
+        }
+        
+        # Buscar TODAS las entradas (principales + timeline)
+        response = requests.post(
+            f'https://api.notion.com/v1/databases/{NOTION_DATABASE_ID}/query',
+            headers=headers,
+            json={
+                "filter": {
+                    "or": [
+                        {
+                            "property": "Cliente",
+                            "title": {"contains": cliente}
+                        },
+                        {
+                            "property": "Cliente", 
+                            "title": {"contains": f"{cliente} - Timeline"}
+                        }
+                    ]
+                },
+                "sorts": [
+                    {
+                        "property": "Fecha de evaluación",
+                        "direction": "ascending"
+                    }
+                ]
+            }
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            timeline_entries = []
+            
+            for page in data.get('results', []):
+                props = page.get('properties', {})
+                
+                # Calcular semáforo
+                eficiencia = props.get('Eficiencia_total', {}).get('number', 0)
+                riesgo = props.get('Riesgo_total', {}).get('number', 0)
+                
+                # Lógica de semáforo
+                if riesgo <= 10 and eficiencia <= 10:
+                    semaforo = "🟢 Ideal"
+                    color_class = "success"
+                elif riesgo <= 10 and eficiencia <= 16:
+                    semaforo = "🟡 Bueno" 
+                    color_class = "warning"
+                elif riesgo <= 16 and eficiencia <= 10:
+                    semaforo = "🟡 Aceptable"
+                    color_class = "warning"
+                elif riesgo <= 16 and eficiencia <= 16:
+                    semaforo = "🟠 Regular"
+                    color_class = "warning"
+                else:
+                    semaforo = "🔴 Crítico"
+                    color_class = "danger"
+                
+                entry = {
+                    'fecha': props.get('Fecha de evaluación', {}).get('date', {}).get('start', ''),
+                    'eficiencia_total': eficiencia,
+                    'riesgo_total': riesgo,
+                    'semaforo': semaforo,
+                    'color_class': color_class,
+                    'estado': props.get('Estado', {}).get('status', {}).get('name', ''),
+                    'responsable': props.get('Responsable Preventa', {}).get('select', {}).get('name', ''),
+                    'is_timeline': '- Timeline' in props.get('Cliente', {}).get('title', [{}])[0].get('text', {}).get('content', '')
+                }
+                timeline_entries.append(entry)
+            
+            return render_template('timeline_cliente.html',
+                                 cliente=cliente,
+                                 timeline=timeline_entries)
+        else:
+            flash('Error al obtener timeline del cliente', 'error')
+            return redirect(url_for('index'))
+            
+    except Exception as e:
+        logger.error(f"Error en timeline: {str(e)}")
+        flash(f'Error al cargar timeline: {str(e)}', 'error')
+        return redirect(url_for('index'))
+
+def update_notion_record(page_id, data):
+    """Actualizar registro existente en Notion"""
+    headers = {
+        'Authorization': f'Bearer {NOTION_TOKEN}',
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+    }
+    
+    def map_select_value(field_name, value):
+        return evaluator.evaluation_options[field_name][int(value)]
+    
+    # Estructura para actualizar (PATCH)
+    notion_data = {
+        "properties": {
+            "Fecha de evaluación": {
+                "date": {"start": datetime.now().isoformat().split('T')[0]}
+            },
+            "Estado": {
+                "status": {"name": "Actualizado"}
+            },
+            "Tiempo para cierre comercial": {
+                "select": {"name": map_select_value('tiempo_cierre_comercial', data.get('tiempo_cierre_comercial', 3))}
+            },
+            "Recursos preventa requeridos": {
+                "select": {"name": map_select_value('recursos_preventa', data.get('recursos_preventa', 3))}
+            },
+            "Historial con el cliente": {
+                "select": {"name": map_select_value('historial_cliente', data.get('historial_cliente', 3))}
+            },
+            "Competencia directa": {
+                "select": {"name": map_select_value('competencia_directa', data.get('competencia_directa', 3))}
+            },
+            "Madurez del cliente": {
+                "select": {"name": map_select_value('madurez_cliente', data.get('madurez_cliente', 3))}
+            },
+            "Naturaleza del PoC": {
+                "select": {"name": map_select_value('naturaleza_poc', data.get('naturaleza_poc', 3))}
+            },
+            "Sponsor ejecutivo": {
+                "select": {"name": map_select_value('sponsor_ejecutivo', data.get('sponsor_ejecutivo', 3))}
+            },
+            "Compromiso del cliente": {
+                "select": {"name": map_select_value('compromiso_cliente', data.get('compromiso_cliente', 3))}
+            },
+            "Complejidad técnica": {
+                "select": {"name": map_select_value('complejidad_tecnica', data.get('complejidad_tecnica', 3))}
+            },
+            "Monto del proyecto": {
+                "select": {"name": map_select_value('monto_proyecto', data.get('monto_proyecto', 3))}
+            },
+            "Potencial comercial": {
+                "select": {"name": map_select_value('potencial_comercial', data.get('potencial_comercial', 3))}
+            },
+            "PoC bien definida": {
+                "select": {"name": map_select_value('poc_definida', data.get('poc_definida', 3))}
+            },
+            "Plazo de ejecución": {
+                "select": {"name": map_select_value('plazo_ejecucion', data.get('plazo_ejecucion', 3))}
+            },
+            "Entorno de pruebas": {
+                "select": {"name": map_select_value('entorno_pruebas', data.get('entorno_pruebas', 3))}
+            },
+            "Presupuesto definido": {
+                "select": {"name": map_select_value('presupuesto_definido', data.get('presupuesto_definido', 3))}
+            },
+            "Eficiencia_total": {
+                "number": data.get('eficiencia_total', 0)
+            },
+            "Riesgo_total": {
+                "number": data.get('riesgo_total', 0)
+            }
+        }
+    }
+    
+    try:
+        response = requests.patch(
+            f'https://api.notion.com/v1/pages/{page_id}',
+            headers=headers,
+            json=notion_data
+        )
+        
+        return response.status_code == 200
+    except Exception as e:
+        logger.error(f"Error al actualizar Notion: {str(e)}")
+        return False
+
+def create_timeline_entry(data):
+    """Crear nueva entrada en timeline (copia con fecha actual)"""
+    # Usar la función send_to_notion existente pero con datos de timeline
+    timeline_data = data.copy()
+    timeline_data['cliente'] = f"{data.get('cliente', '')} - Timeline"
+    
+    return send_to_notion(timeline_data)
 
 if __name__ == '__main__':
     import os
