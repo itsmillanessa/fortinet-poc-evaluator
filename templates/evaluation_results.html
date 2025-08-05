@@ -6,9 +6,342 @@
     <title>Análisis Ejecutivo PoC - {{ form_data.cliente }}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="/static/css/fortinet-theme.css" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="https://www.fortinet.com/content/dam/fortinet/images/general/fortinet-favicon.svg">
-    <meta name="description" content="Análisis ejecutivo de evaluación PoC Fortinet">
+    <style>
+        /* Fortinet Professional Theme - Embedded */
+        :root {
+            --fortinet-red: #EE3124;
+            --fortinet-dark-red: #B71C1C;
+            --fortinet-charcoal: #2C3E50;
+            --fortinet-dark-gray: #343A40;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2C3E50 0%, #343A40 100%);
+            color: #FFFFFF !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .header-gradient {
+            background: linear-gradient(135deg, var(--fortinet-red) 0%, var(--fortinet-dark-red) 100%);
+            box-shadow: 0 4px 15px rgba(238, 49, 36, 0.3);
+            color: #FFFFFF !important;
+        }
+
+        .header-gradient h1, .header-gradient p, .header-gradient div {
+            color: #FFFFFF !important;
+        }
+
+        .fortinet-logo {
+            height: 40px;
+            filter: brightness(0) invert(1);
+        }
+
+        /* Executive Summary */
+        .executive-summary {
+            background: linear-gradient(135deg, rgba(238, 49, 36, 0.9) 0%, rgba(183, 28, 28, 0.9) 100%);
+            border: none;
+            box-shadow: 0 15px 40px rgba(238, 49, 36, 0.3);
+            color: #FFFFFF !important;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .executive-summary h2, .executive-summary p {
+            color: #FFFFFF !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Metrics Dashboard */
+        .metrics-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, rgba(52, 58, 64, 0.95) 0%, rgba(44, 62, 80, 0.95) 100%);
+            border: 1px solid rgba(238, 49, 36, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.4s ease;
+            color: #FFFFFF !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(238, 49, 36, 0.2);
+            border-color: var(--fortinet-red);
+        }
+
+        .metric-card h4, .metric-card p, .metric-card small {
+            color: #FFFFFF !important;
+        }
+
+        .metric-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--fortinet-red), var(--fortinet-dark-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-circle-enhanced {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 4px solid rgba(255,255,255,0.2);
+        }
+
+        .eficiencia-alta { background: linear-gradient(135deg, #28a745, #20c997); color: white !important; }
+        .eficiencia-media { background: linear-gradient(135deg, #ffc107, #fd7e14); color: #000 !important; }
+        .eficiencia-baja { background: linear-gradient(135deg, #6f42c1, #e83e8c); color: white !important; }
+        .riesgo-bajo { background: linear-gradient(135deg, #28a745, #20c997); color: white !important; }
+        .riesgo-medio { background: linear-gradient(135deg, #ffc107, #fd7e14); color: #000 !important; }
+        .riesgo-alto { background: linear-gradient(135deg, #dc3545, #e83e8c); color: white !important; }
+
+        /* Recommendations */
+        .recommendations-professional {
+            background: linear-gradient(135deg, rgba(44, 62, 80, 0.95) 0%, rgba(52, 58, 64, 0.95) 100%);
+            border-left: 5px solid var(--fortinet-red);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            color: #FFFFFF !important;
+        }
+
+        .recommendations-professional h5 {
+            color: #FFFFFF !important;
+        }
+
+        .recommendation-item {
+            background: rgba(248, 249, 250, 0.05);
+            border: 1px solid rgba(238, 49, 36, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--fortinet-red);
+            color: #FFFFFF !important;
+        }
+
+        .recommendation-item:hover {
+            background: rgba(238, 49, 36, 0.1);
+            transform: translateX(5px);
+        }
+
+        /* Breakdown Section */
+        .breakdown-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .breakdown-card {
+            background: linear-gradient(135deg, rgba(52, 58, 64, 0.95) 0%, rgba(44, 62, 80, 0.95) 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .breakdown-header {
+            padding: 1.5rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #FFFFFF !important;
+        }
+
+        .breakdown-header.eficiencia {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .breakdown-header.riesgo {
+            background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+        }
+
+        .breakdown-body {
+            padding: 1.5rem;
+        }
+
+        .criteria-item-professional {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            color: #FFFFFF !important;
+        }
+
+        .criteria-item-professional:hover {
+            transform: translateX(10px);
+        }
+
+        .criteria-item-professional.criteria-1 {
+            background: rgba(40, 167, 69, 0.1);
+            border-left-color: #28a745;
+        }
+
+        .criteria-item-professional.criteria-2 {
+            background: rgba(255, 193, 7, 0.1);
+            border-left-color: #ffc107;
+        }
+
+        .criteria-item-professional.criteria-3 {
+            background: rgba(220, 53, 69, 0.1);
+            border-left-color: #dc3545;
+        }
+
+        /* Action Plan */
+        .action-plan-professional {
+            background: linear-gradient(135deg, rgba(111, 66, 193, 0.9) 0%, rgba(74, 20, 140, 0.9) 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            color: #FFFFFF !important;
+        }
+
+        .action-plan-professional h5 {
+            color: #FFFFFF !important;
+        }
+
+        .action-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .action-step {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #FFFFFF !important;
+        }
+
+        .action-step:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .action-step h6, .action-step p {
+            color: #FFFFFF !important;
+        }
+
+        .action-step-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Buttons */
+        .btn-professional {
+            background: linear-gradient(135deg, var(--fortinet-red) 0%, var(--fortinet-dark-red) 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            font-weight: 600;
+            color: #FFFFFF !important;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(238, 49, 36, 0.3);
+        }
+
+        .btn-professional:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(238, 49, 36, 0.4);
+            color: #FFFFFF !important;
+        }
+
+        .card {
+            background: rgba(52, 58, 64, 0.95) !important;
+            border: 1px solid rgba(238, 49, 36, 0.2) !important;
+            color: #FFFFFF !important;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--fortinet-charcoal) 0%, var(--fortinet-dark-gray) 100%) !important;
+            color: #FFFFFF !important;
+            border-bottom: 2px solid var(--fortinet-red) !important;
+        }
+
+        .card-body {
+            color: #FFFFFF !important;
+        }
+
+        .badge {
+            background-color: var(--fortinet-red) !important;
+            color: #FFFFFF !important;
+        }
+
+        .text-light {
+            color: #FFFFFF !important;
+        }
+
+        .form-control {
+            background-color: rgba(248, 249, 250, 0.1) !important;
+            border: 1px solid rgba(238, 49, 36, 0.3) !important;
+            color: #FFFFFF !important;
+        }
+
+        .form-control:focus {
+            background-color: rgba(248, 249, 250, 0.15) !important;
+            border-color: var(--fortinet-red) !important;
+            color: #FFFFFF !important;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .breakdown-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .score-circle-enhanced {
+                width: 100px;
+                height: 100px;
+                font-size: 1.5rem;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(238, 49, 36, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(238, 49, 36, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(238, 49, 36, 0); }
+        }
+    </style>
 </head>
 <body class="bg-light">
 
