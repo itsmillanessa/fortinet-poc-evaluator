@@ -796,12 +796,6 @@ def actualizar_evaluacion():
         flash(f'Error al actualizar evaluación: {str(e)}', 'error')
         return redirect(url_for('index'))
 
-def update_notion_record(page_id, data):
-    """Actualizar registro existente en Notion"""
-    headers = {
-        'Authorization': f'Bearer {NOTION_TOKEN}',
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28'
     }
     
     def map_select_value(field_name, value):
