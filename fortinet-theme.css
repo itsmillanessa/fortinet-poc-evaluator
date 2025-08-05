@@ -200,6 +200,7 @@ body::before {
 
 h1, h2, h3, h4, h5, h6 {
     color: var(--text-primary) !important;
+    background: transparent !important;
 }
 
 p, span, div, label {
@@ -394,6 +395,19 @@ p, span, div, label {
     box-shadow: 0 0 20px rgba(238, 49, 36, 0.3);
 }
 
+.btn-light,
+.btn-white {
+    background: var(--dark-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.btn-light:hover,
+.btn-white:hover {
+    background: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+}
+
 /* ========== ALERTS HACKER ========== */
 .alert {
     background: var(--dark-card) !important;
@@ -441,6 +455,14 @@ small {
     color: var(--text-muted) !important;
 }
 
+.text-dark {
+    color: var(--text-primary) !important;
+}
+
+.text-black {
+    color: var(--text-primary) !important;
+}
+
 .invalid-feedback {
     color: var(--fortinet-neon-red) !important;
     font-family: 'Roboto Mono', monospace;
@@ -477,6 +499,210 @@ a:hover {
     text-shadow: 0 0 5px var(--fortinet-neon-red);
 }
 
+/* ========== TABLAS ========== */
+table,
+.table,
+.table-responsive {
+    background: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.table th,
+.table td {
+    border-color: var(--dark-border) !important;
+    color: var(--text-primary) !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background: var(--dark-secondary) !important;
+}
+
+/* ========== MODALS Y DROPDOWNS ========== */
+.modal-content {
+    background: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--dark-border) !important;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--dark-border) !important;
+}
+
+.dropdown-menu {
+    background: var(--dark-card) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.dropdown-item {
+    color: var(--text-primary) !important;
+}
+
+.dropdown-item:hover {
+    background: var(--dark-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ========== ELEMENTOS BOOTSTRAP ========== */
+.bg-white,
+.bg-light {
+    background: var(--dark-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.progress {
+    background: var(--dark-secondary) !important;
+}
+
+.progress-bar {
+    background: var(--fortinet-red) !important;
+}
+
+.breadcrumb {
+    background: var(--dark-secondary) !important;
+}
+
+.breadcrumb-item a {
+    color: var(--fortinet-red) !important;
+}
+
+/* ========== GRÁFICOS Y CANVAS ========== */
+#evolutionChart,
+canvas,
+svg {
+    background: var(--dark-card) !important;
+    background-color: var(--dark-card) !important;
+    border: 1px solid var(--dark-border) !important;
+    border-radius: 8px !important;
+}
+
+.chart-container,
+.chart-wrapper,
+.chart-area,
+.chart-content,
+[class*="chart"],
+[class*="graph"],
+[class*="plot"] {
+    background: var(--dark-card) !important;
+    background-color: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+    border-radius: 8px !important;
+}
+
+/* Contenedores de gráficos */
+.col-md-6 {
+    background: var(--dark-card) !important;
+    border-radius: 8px !important;
+    margin: 5px !important;
+    padding: 20px !important;
+    border: 1px solid var(--dark-border) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Listas de tendencias */
+.list-unstyled {
+    background: var(--dark-secondary) !important;
+    padding: 15px !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.list-unstyled li {
+    color: var(--text-primary) !important;
+    padding: 5px 0 !important;
+    border-bottom: 1px solid var(--dark-border) !important;
+}
+
+.list-unstyled li:last-child {
+    border-bottom: none !important;
+}
+
+/* Texto en gráficos */
+text,
+.recharts-text,
+.recharts-label,
+.chart-text,
+.axis-label,
+.tick text,
+.axis text,
+.legend text,
+.label text {
+    fill: var(--text-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Grid lines en gráficos */
+.recharts-cartesian-grid line,
+.grid line,
+.tick line,
+.domain {
+    stroke: var(--dark-border) !important;
+}
+
+/* Chart.js específicos */
+.recharts-wrapper,
+.recharts-surface,
+.recharts-cartesian-grid,
+.recharts-responsive-container,
+.chartjs-render-monitor {
+    background: var(--dark-card) !important;
+}
+
+/* ========== OVERRIDE AGRESIVO PARA ELEMENTOS BLANCOS ========== */
+[style*="background: white"],
+[style*="background-color: white"],
+[style*="background: #fff"],
+[style*="background-color: #fff"],
+[style*="background: #ffffff"],
+[style*="background-color: #ffffff"],
+[style*="background: rgb(255, 255, 255)"],
+[style*="background-color: rgb(255, 255, 255)"],
+[style*="background-color: #f8f9fa"] {
+    background: var(--dark-card) !important;
+    background-color: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Contenedores principales */
+.container,
+.container-fluid {
+    background: var(--dark-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+.row {
+    background: transparent !important;
+}
+
+/* Secciones */
+section {
+    background: var(--dark-card) !important;
+    background-color: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--dark-border) !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    margin: 10px 0 !important;
+}
+
+/* ========== TOOLTIPS ========== */
+.tooltip-inner {
+    background: var(--dark-card) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ========== SOMBRAS ========== */
+.shadow,
+.shadow-sm,
+.shadow-lg {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) !important;
+}
+
 /* ========== SCROLLBAR HACKER ========== */
 ::-webkit-scrollbar {
     width: 8px;
@@ -510,377 +736,3 @@ a:hover {
         font-size: 14px;
     }
 }
-/* ========== AGREGAR AL FINAL DE TU fortinet-theme.css ========== */
-
-/* ========== FIX PARA ELEMENTOS BLANCOS ========== */
-
-/* Elementos con fondo blanco genéricos */
-.bg-white, 
-[style*="background-color: white"], 
-[style*="background-color: #ffffff"], 
-[style*="background-color: #fff"],
-[style*="background: white"],
-[style*="background: #ffffff"],
-[style*="background: #fff"] {
-    background: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-    border: 1px solid var(--dark-border) !important;
-}
-
-/* Charts y gráficos */
-.chart-container,
-.chart-wrapper,
-.chart,
-canvas,
-svg {
-    background: var(--dark-card) !important;
-    border: 1px solid var(--dark-border) !important;
-    border-radius: 8px !important;
-}
-
-/* Cajas de análisis específicas */
-[class*="analisis"],
-[class*="analysis"],
-[class*="chart"],
-[class*="graph"],
-[class*="metric"] {
-    background: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-    border: 1px solid var(--dark-border) !important;
-    border-radius: 8px !important;
-}
-
-/* Headers con fondo blanco */
-h1, h2, h3, h4, h5, h6 {
-    background: transparent !important;
-    color: var(--text-primary) !important;
-}
-
-/* Botones específicos con fondos claros */
-.btn-light,
-.btn-white,
-[style*="background-color: #f8f9fa"] {
-    background: var(--dark-secondary) !important;
-    color: var(--text-primary) !important;
-    border: 1px solid var(--dark-border) !important;
-}
-
-.btn-light:hover,
-.btn-white:hover {
-    background: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-}
-
-/* Tablas con fondo blanco */
-table,
-.table,
-.table-responsive {
-    background: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-    border: 1px solid var(--dark-border) !important;
-}
-
-.table th,
-.table td {
-    border-color: var(--dark-border) !important;
-    color: var(--text-primary) !important;
-}
-
-.table-striped tbody tr:nth-of-type(odd) {
-    background: var(--dark-secondary) !important;
-}
-
-/* Elementos de Bootstrap que pueden ser blancos */
-.bg-light {
-    background: var(--dark-secondary) !important;
-    color: var(--text-primary) !important;
-}
-
-.text-dark {
-    color: var(--text-primary) !important;
-}
-
-/* Modals y popups */
-.modal-content {
-    background: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-    border: 1px solid var(--dark-border) !important;
-}
-
-.modal-header {
-    border-bottom: 1px solid var(--dark-border) !important;
-}
-
-.modal-footer {
-    border-top: 1px solid var(--dark-border) !important;
-}
-
-/* Dropdowns */
-.dropdown-menu {
-    background: var(--dark-card) !important;
-    border: 1px solid var(--dark-border) !important;
-}
-
-.dropdown-item {
-    color: var(--text-primary) !important;
-}
-
-.dropdown-item:hover {
-    background: var(--dark-secondary) !important;
-    color: var(--text-primary) !important;
-}
-
-/* Elementos específicos para gráficos */
-.chart-title,
-.chart-legend,
-.chart-labels {
-    color: var(--text-primary) !important;
-    background: transparent !important;
-}
-
-/* Progress bars */
-.progress {
-    background: var(--dark-secondary) !important;
-}
-
-.progress-bar {
-    background: var(--fortinet-red) !important;
-}
-
-/* Breadcrumbs */
-.breadcrumb {
-    background: var(--dark-secondary) !important;
-}
-
-.breadcrumb-item a {
-    color: var(--fortinet-red) !important;
-}
-
-/* Tooltips */
-.tooltip-inner {
-    background: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-}
-
-/* ========== FIX ESPECÍFICO PARA ELEMENTOS CON ESTILOS INLINE ========== */
-
-/* Override para cualquier elemento con estilo inline blanco */
-[style] {
-    background-color: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-}
-
-/* Excepción para elementos que SÍ deben mantener colores específicos */
-.score-indicator,
-.badge,
-.btn-primary,
-.btn-outline-primary,
-.alert-success,
-.alert-warning,
-.alert-danger,
-.alert-info {
-    /* Estos mantienen sus estilos originales */
-}
-
-/* ========== FIX PARA TEXTO EN GRÁFICOS ========== */
-text, 
-.recharts-text,
-.recharts-label,
-.chart-text,
-.axis-label {
-    fill: var(--text-primary) !important;
-    color: var(--text-primary) !important;
-}
-
-/* Grid lines en gráficos */
-.recharts-cartesian-grid line {
-    stroke: var(--dark-border) !important;
-}
-
-/* ========== ELEMENTOS CON SOMBRAS BLANCAS ========== */
-.shadow,
-.shadow-sm,
-.shadow-lg {
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) !important;
-}
-
-/* ========== OVERRIDE GLOBAL MÁS AGRESIVO ========== */
-* {
-    /* Solo si los otros fixes no funcionan */
-}
-
-*[style*="background: white"],
-*[style*="background-color: white"],
-*[style*="background: #fff"],
-*[style*="background-color: #fff"],
-*[style*="background: #ffffff"],
-*[style*="background-color: #ffffff"] {
-    background: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-}
-/* ========== FIX AGRESIVO - AGREGAR AL FINAL DEL CSS ========== */
-
-/* ========== OVERRIDE SÚPER AGRESIVO PARA ELEMENTOS BLANCOS ========== */
-
-/* Fuerza TODOS los elementos con fondo blanco/claro */
-*,
-*:before,
-*:after {
-    /* Solo elementos con fondos problemáticos */
-}
-
-/* Override para elementos específicos del gráfico */
-div[style*="background"],
-div[style*="background-color"],
-section[style*="background"], 
-article[style*="background"],
-main[style*="background"] {
-    background: var(--dark-card) !important;
-    background-color: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-}
-
-/* Chart containers específicos */
-.chart-container,
-.chart-wrapper,
-.chart-area,
-.chart-content,
-[class*="chart"],
-[class*="graph"],
-[class*="plot"] {
-    background: var(--dark-card) !important;
-    background-color: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-    border: 1px solid var(--dark-border) !important;
-    border-radius: 8px !important;
-}
-
-/* SVG y Canvas - elementos gráficos */
-svg,
-canvas {
-    background: var(--dark-card) !important;
-    background-color: var(--dark-card) !important;
-}
-
-/* Recharts específicos (si usas React Charts) */
-.recharts-wrapper,
-.recharts-surface,
-.recharts-cartesian-grid,
-.recharts-responsive-container {
-    background: var(--dark-card) !important;
-}
-
-/* Chart.js específicos */
-.chartjs-render-monitor,
-.chart-container canvas {
-    background: var(--dark-card) !important;
-}
-
-/* D3.js y otros */
-.d3-chart,
-.plot-container,
-.plotly {
-    background: var(--dark-card) !important;
-}
-
-/* Override MUY agresivo para elementos inline */
-[style*="background: white"] { background: var(--dark-card) !important; }
-[style*="background-color: white"] { background-color: var(--dark-card) !important; }
-[style*="background: #fff"] { background: var(--dark-card) !important; }
-[style*="background-color: #fff"] { background-color: var(--dark-card) !important; }
-[style*="background: #ffffff"] { background: var(--dark-card) !important; }
-[style*="background-color: #ffffff"] { background-color: var(--dark-card) !important; }
-[style*="background: rgb(255, 255, 255)"] { background: var(--dark-card) !important; }
-[style*="background-color: rgb(255, 255, 255)"] { background-color: var(--dark-card) !important; }
-
-/* Elementos con clases de Bootstrap problemáticas */
-.bg-white { background-color: var(--dark-card) !important; }
-.bg-light { background-color: var(--dark-secondary) !important; }
-.text-dark { color: var(--text-primary) !important; }
-.text-black { color: var(--text-primary) !important; }
-
-/* Headers específicos del análisis */
-h1, h2, h3, h4, h5, h6,
-.title, .header, .heading {
-    background: transparent !important;
-    background-color: transparent !important;
-    color: var(--text-primary) !important;
-}
-
-/* Cards y containers */
-.card, .container, .row, .col,
-.panel, .widget, .box {
-    background: var(--dark-card) !important;
-    background-color: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-}
-
-/* Texto en gráficos - más específico */
-text {
-    fill: var(--text-primary) !important;
-    color: var(--text-primary) !important;
-}
-
-.tick text,
-.axis text,
-.legend text,
-.label text {
-    fill: var(--text-primary) !important;
-    color: var(--text-primary) !important;
-}
-
-/* Grid lines */
-.grid line,
-.tick line,
-.domain {
-    stroke: var(--dark-border) !important;
-}
-
-/* ========== OVERRIDE JAVASCRIPT GENERADO ========== */
-
-/* Para elementos que se generan dinámicamente */
-div:not(.score-indicator):not(.badge):not([class*="btn"]) {
-    background-color: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-}
-
-/* ========== FIX PARA ANÁLISIS ESPECÍFICO ========== */
-
-/* Contenedor principal del análisis */
-[class*="analisis"],
-[class*="analysis"],
-#analisis,
-#analysis {
-    background: var(--dark-bg) !important;
-    background-color: var(--dark-bg) !important;
-    color: var(--text-primary) !important;
-}
-
-/* Secciones dentro del análisis */
-section {
-    background: var(--dark-card) !important;
-    background-color: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-    border: 1px solid var(--dark-border) !important;
-    border-radius: 8px !important;
-    padding: 20px !important;
-    margin: 10px 0 !important;
-}
-
-/* ========== ÚLTIMO RECURSO - NUCLEAR OPTION ========== */
-
-/* Si nada más funciona, usa esto: */
-/*
-* {
-    background: var(--dark-card) !important;
-    background-color: var(--dark-card) !important;
-    color: var(--text-primary) !important;
-}
-
-.score-indicator,
-.badge,
-.btn,
-[class*="btn"] {
-    // Excepciones - mantienen sus estilos
-}
-*/
