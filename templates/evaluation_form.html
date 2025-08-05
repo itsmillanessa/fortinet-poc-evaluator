@@ -81,7 +81,32 @@ if (cliente) {
             {% endif %}
         {% endwith %}
 
-        <form method="POST" action="/evaluate" class="needs-validation" novalidate>
+        <!-- Alertas para modo edición/duplicación -->
+        {% if is_edit %}
+        <input type="hidden" name="notion_page_id" value="{{ edit_data.notion_page_id }}">
+        <input type="hidden" name="fecha_original" value="{{ edit_data.fecha_original }}">
+        <div class="alert alert-info mb-4">
+            <i class="fas fa-edit me-2"></i>
+            <strong>Modo Edición:</strong> Actualizando evaluación existente del {{ edit_data.fecha_original }}
+            <br><small>Los cambios crearán una nueva entrada en el timeline manteniendo el historial.</small>
+        </div>
+        {% endif %}
+
+        {% if is_duplicate %}
+        <div class="alert alert-success mb-4">
+            <i class="fas fa-copy me-2"></i>
+            <strong>Modo Duplicación:</strong> Creando nueva evaluación basada en evaluación del {{ edit_data.fecha_original }}
+            <br><small>Los datos han sido prellenados. Modifica lo que necesites y guarda como nueva evaluación.</small>
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{% if is_edit %}/actualizar{% else %}/evaluate{% endif %}" class="needs-validation" novalidate>
+            
+            <!-- Campos ocultos para edición -->
+            {% if is_edit %}
+            <input type="hidden" name="notion_page_id" value="{{ edit_data.notion_page_id }}">
+            <input type="hidden" name="fecha_original" value="{{ edit_data.fecha_original }}">
+            {% endif %}
             
             <!-- Información General -->
             <div class="card mb-4 card-hover">
@@ -93,7 +118,8 @@ if (cliente) {
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="cliente" class="form-label">Cliente *</label>
-                                <input type="text" class="form-control" id="cliente" name="cliente" required>
+                                <input type="text" class="form-control" id="cliente" name="cliente" 
+                                       value="{% if is_edit or is_duplicate %}{{ edit_data.cliente }}{% endif %}" required>
                                 <div class="invalid-feedback">Por favor ingrese el nombre del cliente.</div>
                             </div>
                         </div>
@@ -103,7 +129,10 @@ if (cliente) {
                                 <select class="form-select" id="proyecto" name="proyecto" required>
                                     <option value="">Seleccione el proyecto...</option>
                                     {% for proyecto in evaluator.proyectos_fortinet %}
-                                        <option value="{{ proyecto }}">{{ proyecto }}</option>
+                                        <option value="{{ proyecto }}" 
+                                                {% if (is_edit or is_duplicate) and edit_data.proyecto == proyecto %}selected{% endif %}>
+                                            {{ proyecto }}
+                                        </option>
                                     {% endfor %}
                                 </select>
                                 <div class="invalid-feedback">Por favor seleccione un proyecto.</div>
@@ -113,18 +142,21 @@ if (cliente) {
                             <div class="mb-3">
                                 <label for="responsable_preventa" class="form-label">Responsable de Preventa *</label>
                                 <select class="form-select" id="responsable_preventa" name="responsable_preventa" required>
-    				    <option value="">Seleccione responsable...</option>
-    				    {% for responsable in evaluator.responsables_preventa %}
-        				<option value="{{ responsable }}">{{ responsable }}</option>
-    				    {% endfor %}
-				</select>
+                                    <option value="">Seleccione responsable...</option>
+                                    {% for responsable in evaluator.responsables_preventa %}
+                                        <option value="{{ responsable }}" 
+                                                {% if (is_edit or is_duplicate) and edit_data.responsable_preventa == responsable %}selected{% endif %}>
+                                            {{ responsable }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
                                 <div class="invalid-feedback">Por favor seleccione un responsable.</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="descripcion" class="form-label">Descripción del PoC</label>
-                                <textarea class="form-control" id="descripcion" name="descripcion" rows="3" placeholder="Descripción breve del alcance y objetivos..."></textarea>
+                                <textarea class="form-control" id="descripcion" name="descripcion" rows="3" placeholder="Descripción breve del alcance y objetivos...">{% if is_edit or is_duplicate %}{{ edit_data.descripcion }}{% endif %}</textarea>
                             </div>
                         </div>
                     </div>
@@ -145,7 +177,9 @@ if (cliente) {
                             <div class="help-text">¿Cuánto tiempo estiman para tomar la decisión de compra?</div>
                             {% for value, text in evaluator.evaluation_options['tiempo_cierre_comercial'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="tiempo_cierre_comercial" id="tiempo_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="tiempo_cierre_comercial" id="tiempo_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.tiempo_cierre_comercial == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="tiempo_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -160,7 +194,9 @@ if (cliente) {
                             <div class="help-text">¿Cuánto esfuerzo de preventa se requiere?</div>
                             {% for value, text in evaluator.evaluation_options['recursos_preventa'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="recursos_preventa" id="recursos_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="recursos_preventa" id="recursos_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.recursos_preventa == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="recursos_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -175,7 +211,9 @@ if (cliente) {
                             <div class="help-text">¿Cuál es el valor comercial esperado?</div>
                             {% for value, text in evaluator.evaluation_options['monto_proyecto'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="monto_proyecto" id="monto_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="monto_proyecto" id="monto_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.monto_proyecto == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="monto_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -190,7 +228,9 @@ if (cliente) {
                             <div class="help-text">¿Qué tan real es la oportunidad de negocio?</div>
                             {% for value, text in evaluator.evaluation_options['potencial_comercial'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="potencial_comercial" id="potencial_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="potencial_comercial" id="potencial_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.potencial_comercial == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="potencial_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -205,7 +245,9 @@ if (cliente) {
                             <div class="help-text">¿Qué tan claros son los criterios de éxito?</div>
                             {% for value, text in evaluator.evaluation_options['poc_definida'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="poc_definida" id="definida_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="poc_definida" id="definida_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.poc_definida == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="definida_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -220,7 +262,9 @@ if (cliente) {
                             <div class="help-text">¿Es factible el timeline propuesto?</div>
                             {% for value, text in evaluator.evaluation_options['plazo_ejecucion'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="plazo_ejecucion" id="plazo_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="plazo_ejecucion" id="plazo_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.plazo_ejecucion == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="plazo_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -235,7 +279,9 @@ if (cliente) {
                             <div class="help-text">¿Dónde se realizará la PoC?</div>
                             {% for value, text in evaluator.evaluation_options['entorno_pruebas'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="entorno_pruebas" id="entorno_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="entorno_pruebas" id="entorno_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.entorno_pruebas == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="entorno_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -250,7 +296,9 @@ if (cliente) {
                             <div class="help-text">¿Existe presupuesto aprobado?</div>
                             {% for value, text in evaluator.evaluation_options['presupuesto_definido'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="presupuesto_definido" id="presupuesto_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="presupuesto_definido" id="presupuesto_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.presupuesto_definido == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="presupuesto_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -276,7 +324,9 @@ if (cliente) {
                             <div class="help-text">¿Qué relación comercial existe con el cliente?</div>
                             {% for value, text in evaluator.evaluation_options['historial_cliente'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="historial_cliente" id="historial_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="historial_cliente" id="historial_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.historial_cliente == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="historial_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -291,7 +341,9 @@ if (cliente) {
                             <div class="help-text">¿Cuál es nuestra posición competitiva?</div>
                             {% for value, text in evaluator.evaluation_options['competencia_directa'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="competencia_directa" id="competencia_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="competencia_directa" id="competencia_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.competencia_directa == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="competencia_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -306,7 +358,9 @@ if (cliente) {
                             <div class="help-text">¿Qué experiencia tiene el cliente con la tecnología?</div>
                             {% for value, text in evaluator.evaluation_options['madurez_cliente'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="madurez_cliente" id="madurez_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="madurez_cliente" id="madurez_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.madurez_cliente == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="madurez_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -321,7 +375,9 @@ if (cliente) {
                             <div class="help-text">¿Cuál es el propósito real del PoC?</div>
                             {% for value, text in evaluator.evaluation_options['naturaleza_poc'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="naturaleza_poc" id="naturaleza_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="naturaleza_poc" id="naturaleza_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.naturaleza_poc == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="naturaleza_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -336,7 +392,9 @@ if (cliente) {
                             <div class="help-text">¿Existe un patrocinador ejecutivo del proyecto?</div>
                             {% for value, text in evaluator.evaluation_options['sponsor_ejecutivo'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="sponsor_ejecutivo" id="sponsor_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="sponsor_ejecutivo" id="sponsor_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.sponsor_ejecutivo == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="sponsor_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -351,7 +409,9 @@ if (cliente) {
                             <div class="help-text">¿Qué recursos dedicará el cliente?</div>
                             {% for value, text in evaluator.evaluation_options['compromiso_cliente'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="compromiso_cliente" id="compromiso_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="compromiso_cliente" id="compromiso_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.compromiso_cliente == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="compromiso_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -366,7 +426,9 @@ if (cliente) {
                             <div class="help-text">¿Qué tan compleja es la implementación?</div>
                             {% for value, text in evaluator.evaluation_options['complejidad_tecnica'].items() %}
                             <div class="radio-option">
-                                <input type="radio" name="complejidad_tecnica" id="complejidad_{{ value }}" value="{{ value }}" {% if value == 2 %}checked{% endif %}>
+                                <input type="radio" name="complejidad_tecnica" id="complejidad_{{ value }}" value="{{ value }}" 
+                                       {% if (is_edit or is_duplicate) and edit_data.complejidad_tecnica == value %}checked
+                                       {% elif not is_edit and not is_duplicate and value == 2 %}checked{% endif %}>
                                 <label for="complejidad_{{ value }}" class="form-label">
                                     <span class="score-indicator score-{{ value }}">{{ value }}</span>
                                     {{ text }}
@@ -382,7 +444,13 @@ if (cliente) {
             <div class="card mb-5">
                 <div class="card-body text-center">
                     <button type="submit" class="btn btn-lg me-3" style="background-color: #EE3124; color: white;">
-                        <i class="fas fa-calculator me-2"></i>Evaluar PoC
+                        {% if is_edit %}
+                            <i class="fas fa-save me-2"></i>Actualizar Evaluación
+                        {% elif is_duplicate %}
+                            <i class="fas fa-plus me-2"></i>Crear Nueva Evaluación (Duplicada)
+                        {% else %}
+                            <i class="fas fa-calculator me-2"></i>Evaluar PoC
+                        {% endif %}
                     </button>
                     <button type="reset" class="btn btn-outline-secondary btn-lg">
                         <i class="fas fa-undo me-2"></i>Limpiar Formulario

@@ -870,6 +870,74 @@ def create_timeline_entry(data):
     
     return send_to_notion(timeline_data)
 
+# 🔧 AGREGAR ESTA RUTA EN TU app.py (después de la ruta /timeline/)
+
+@app.route('/duplicar/<string:notion_page_id>')
+def duplicar_evaluacion(notion_page_id):
+    """Cargar evaluación existente para duplicar (crear nueva basada en existente)"""
+    try:
+        headers = {
+            'Authorization': f'Bearer {NOTION_TOKEN}',
+            'Notion-Version': '2022-06-28'
+        }
+        
+        # Obtener la página específica de Notion
+        response = requests.get(
+            f'https://api.notion.com/v1/pages/{notion_page_id}',
+            headers=headers
+        )
+        
+        if response.status_code == 200:
+            page_data = response.json()
+            props = page_data.get('properties', {})
+            
+            # Mapear datos de Notion de vuelta al formulario
+            def reverse_map_value(field_name, notion_value):
+                option_text = notion_value.get('select', {}).get('name', '')
+                for key, text in evaluator.evaluation_options[field_name].items():
+                    if text == option_text:
+                        return key
+                return 3  # Default
+            
+            # Extraer datos para prellenar el formulario
+            evaluacion_data = {
+                'cliente': props.get('Cliente', {}).get('title', [{}])[0].get('text', {}).get('content', ''),
+                'proyecto': props.get('Proyecto', {}).get('select', {}).get('name', ''),
+                'responsable_preventa': props.get('Responsable Preventa', {}).get('select', {}).get('name', ''),
+                'descripcion': '',  # No se guarda en Notion actualmente
+                'tiempo_cierre_comercial': reverse_map_value('tiempo_cierre_comercial', props.get('Tiempo para cierre comercial', {})),
+                'recursos_preventa': reverse_map_value('recursos_preventa', props.get('Recursos preventa requeridos', {})),
+                'historial_cliente': reverse_map_value('historial_cliente', props.get('Historial con el cliente', {})),
+                'competencia_directa': reverse_map_value('competencia_directa', props.get('Competencia directa', {})),
+                'madurez_cliente': reverse_map_value('madurez_cliente', props.get('Madurez del cliente', {})),
+                'naturaleza_poc': reverse_map_value('naturaleza_poc', props.get('Naturaleza del PoC', {})),
+                'sponsor_ejecutivo': reverse_map_value('sponsor_ejecutivo', props.get('Sponsor ejecutivo', {})),
+                'compromiso_cliente': reverse_map_value('compromiso_cliente', props.get('Compromiso del cliente', {})),
+                'complejidad_tecnica': reverse_map_value('complejidad_tecnica', props.get('Complejidad técnica', {})),
+                'monto_proyecto': reverse_map_value('monto_proyecto', props.get('Monto del proyecto', {})),
+                'potencial_comercial': reverse_map_value('potencial_comercial', props.get('Potencial comercial', {})),
+                'poc_definida': reverse_map_value('poc_definida', props.get('PoC bien definida', {})),
+                'plazo_ejecucion': reverse_map_value('plazo_ejecucion', props.get('Plazo de ejecución', {})),
+                'entorno_pruebas': reverse_map_value('entorno_pruebas', props.get('Entorno de pruebas', {})),
+                'presupuesto_definido': reverse_map_value('presupuesto_definido', props.get('Presupuesto definido', {})),
+                # NO incluir notion_page_id para que se cree una nueva evaluación
+                'is_duplicate': True,  # Bandera para mostrar mensaje de duplicación
+                'fecha_original': props.get('Fecha de evaluación', {}).get('date', {}).get('start', '')
+            }
+            
+            return render_template('evaluation_form.html', 
+                                 evaluator=evaluator,
+                                 edit_data=evaluacion_data,
+                                 is_duplicate=True)
+        else:
+            flash('Error al cargar evaluación para duplicar', 'error')
+            return redirect(url_for('index'))
+            
+    except Exception as e:
+        logger.error(f"Error al cargar evaluación para duplicar: {str(e)}")
+        flash(f'Error al cargar evaluación para duplicar: {str(e)}', 'error')
+        return redirect(url_for('index'))
+
 if __name__ == '__main__':
     import os
     # Detectar si estamos en Railway
