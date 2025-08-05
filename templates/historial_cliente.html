@@ -135,7 +135,7 @@
                         <small class="text-info">🟠 Cuidado</small>
                         <small class="text-success">🟢 Ideal</small>
                     </div>
-                    <div class="progress-marker" style="left: {% if evaluaciones|last %}{% if 'Ideal' in evaluaciones|last.semaforo %}85%{% elif 'Bueno' in evaluaciones|last.semaforo %}70%{% elif 'Cuidado' in evaluaciones|last.semaforo %}50%{% else %}15%{% endif %}{% else %}15%{% endif %};"></div>
+                    <div class="progress-marker" style="left: {% if evaluaciones %}{% set last_eval = evaluaciones[0] %}{% if 'Ideal' in last_eval.semaforo %}85%{% elif 'Bueno' in last_eval.semaforo %}70%{% elif 'Cuidado' in last_eval.semaforo %}50%{% else %}15%{% endif %}{% else %}15%{% endif %};"></div>
                 </div>
             </div>
 
